@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=s3cret_password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=app_database
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com 
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
