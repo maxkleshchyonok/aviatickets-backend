@@ -12,4 +12,12 @@ export class SignUpForm {
   @IsString()
   @RemoveExtraSpaces()
   password: string;
+
+  @IsString()
+  @RemoveExtraSpaces()
+  firstName: string;
+
+  @IsString()
+  @RemoveExtraSpaces()
+  lastName: string;
 }
