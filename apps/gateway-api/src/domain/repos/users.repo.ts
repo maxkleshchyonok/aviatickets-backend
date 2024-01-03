@@ -11,4 +11,15 @@ export class UsersRepo {
       where: { email },
     });
   }
+
+  async createOne(
+    user: Pick<
+      User,
+      'roleId' | 'roleType' | 'email' | 'password' | 'firstName' | 'lastName'
+    >,
+  ) {
+    return await this.prisma.user.create({
+      data: { ...user },
+    });
+  }
 }
