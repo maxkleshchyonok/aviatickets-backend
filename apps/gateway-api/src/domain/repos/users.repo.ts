@@ -19,6 +19,9 @@ export class UsersRepo {
   ) {
     return await this.prisma.user.findUnique({
       where: { email, password },
+      include: {
+        role: true,
+      },
     });
   }
 
@@ -30,6 +33,9 @@ export class UsersRepo {
   ) {
     return await this.prisma.user.create({
       data: { ...user },
+      include: {
+        role: true,
+      },
     });
   }
 

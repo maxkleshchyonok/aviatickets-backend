@@ -12,7 +12,7 @@ import { AuthDto } from 'api/domain/dto/auth.dto';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { CurrentUser } from 'api/libs/security/decorators/current-user.decorator';
-import { AccessTokenGuard } from 'api/libs/security/guards/access-token.guard';
+import { JwtPermissionsGuard } from 'api/libs/security/guards/jwt-permissions.guard';
 import { AuthService } from './auth.service';
 import { SignInForm } from './dto/signin.form';
 import { SignUpForm } from './dto/signup.form';
@@ -37,6 +37,7 @@ export class AuthController {
       id: newUserEntity.id,
       roleId: newUserEntity.roleId,
       roleType: newUserEntity.roleType,
+      permissions: newUserEntity.role.permissions,
     };
 
     const tokens = this.authService.generateTokens(payload);
@@ -63,6 +64,7 @@ export class AuthController {
       id: userEntity.id,
       roleId: userEntity.roleId,
       roleType: userEntity.roleType,
+      permissions: userEntity.role.permissions,
     };
 
     const tokens = this.authService.generateTokens(payload);
@@ -75,7 +77,7 @@ export class AuthController {
   }
 
   @Get('signout')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(JwtPermissionsGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
     await this.authService.signout(user.id);

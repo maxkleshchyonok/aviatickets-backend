@@ -1,4 +1,4 @@
-import { RoleTypes } from '@prisma/client';
+import { RoleTypes, UserPermissions } from '@prisma/client';
 import { IsIn, IsUUID } from 'class-validator';
 
 export class UserSessionDto {
@@ -11,11 +11,14 @@ export class UserSessionDto {
   @IsIn(Object.values(RoleTypes))
   roleType: RoleTypes;
 
+  permissions: UserPermissions[];
+
   static from(session: UserSessionDto) {
     const it = new UserSessionDto();
     it.id = session.id;
     it.roleId = session.roleId;
     it.roleType = session.roleType;
+    it.permissions = session.permissions;
     return it;
   }
 }
