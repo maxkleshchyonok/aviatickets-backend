@@ -1,8 +1,10 @@
 import { RoleTypes } from '@prisma/client';
 import { IsIn, IsUUID } from 'class-validator';
-import { UUIDDto } from './uuid.dto';
 
-export class UserSessionDto extends UUIDDto {
+export class UserSessionDto {
+  @IsUUID()
+  id: string;
+
   @IsUUID()
   roleId: string;
 
@@ -14,8 +16,6 @@ export class UserSessionDto extends UUIDDto {
     it.id = session.id;
     it.roleId = session.roleId;
     it.roleType = session.roleType;
-    it.createdAt = session.createdAt.valueOf();
-    it.updatedAt = session.updatedAt.valueOf();
     return it;
   }
 }
