@@ -1,5 +1,17 @@
 import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
+import { SignOptions } from 'jsonwebtoken';
+
+export interface SecurityConfig {
+  accessTokenOptions: {
+    secret: string;
+    signOptions: SignOptions;
+  };
+  refreshTokenOptions: {
+    secret: string;
+    signOptions: SignOptions;
+  };
+}
 
 export default registerAs('security', () => {
   const envVarsSchema = Joi.object()
@@ -24,15 +36,13 @@ export default registerAs('security', () => {
       secret: envVars.ACCESS_TOKEN_SECRET,
       signOptions: {
         expiresIn: envVars.ACCESS_TOKEN_LIFETIME,
-        algorithm: 'ES256',
       },
     },
     refreshTokenOptions: {
       secret: envVars.REFRESH_TOKEN_SECRET,
       signOptions: {
         expiresIn: envVars.REFRESH_TOKEN_LIFETIME,
-        algorithm: 'ES256',
       },
     },
-  };
+  } as SecurityConfig;
 });
