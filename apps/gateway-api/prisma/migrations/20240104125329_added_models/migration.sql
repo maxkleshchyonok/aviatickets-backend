@@ -26,7 +26,9 @@ CREATE TABLE "users" (
     "role_type" "RoleTypes" NOT NULL DEFAULT 'user',
     "password" TEXT NOT NULL,
     "refresh_token" TEXT,
-    "roleId" UUID NOT NULL
+    "roleId" UUID NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -98,9 +100,6 @@ CREATE TABLE "planes" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "roles_id_type_key" ON "roles"("id", "type");
-
--- CreateIndex
-CREATE UNIQUE INDEX "users_id_key" ON "users"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
