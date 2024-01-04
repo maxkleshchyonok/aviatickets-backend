@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RoleTypes, User } from '@prisma/client';
-import { UserSessionDto } from 'api/domain/dto/user-session.dto';
+import { Role, RoleTypes, User } from '@prisma/client';
 import { RolesRepo } from 'api/domain/repos/roles.repo';
 import { UsersRepo } from 'api/domain/repos/users.repo';
 import { SecurityService } from 'api/libs/security/security.service';
@@ -48,8 +47,8 @@ export class AuthService {
     });
   }
 
-  generateTokens(payload: UserSessionDto) {
-    return this.securityService.generateTokens(payload);
+  generateTokens(model: User & { role: Role }) {
+    return this.securityService.generateTokens(model);
   }
 
   async setRefreshToken(

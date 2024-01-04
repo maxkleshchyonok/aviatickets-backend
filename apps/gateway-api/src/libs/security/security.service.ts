@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { Role, User } from '@prisma/client';
 import { SecurityConfig } from 'api/config/security.config';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import * as crypto from 'crypto';
@@ -21,7 +22,8 @@ export class SecurityService {
     return (await this.hashPassword(plainPassword)) === hashedPassword;
   }
 
-  generateTokens(payload: UserSessionDto) {
+  generateTokens(model: User & { role: Role }) {
+    const payload = UserSessionDto.toPlainObject(model);
     const securityConfig = this.config.get<SecurityConfig>('security');
 
     const { secret: atSecret, signOptions: atSignOptions } =

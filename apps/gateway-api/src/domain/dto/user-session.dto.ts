@@ -1,4 +1,4 @@
-import { RoleTypes, UserPermissions } from '@prisma/client';
+import { Role, RoleTypes, User, UserPermissions } from '@prisma/client';
 import { IsIn, IsUUID } from 'class-validator';
 
 export class UserSessionDto {
@@ -20,5 +20,14 @@ export class UserSessionDto {
     it.roleType = session.roleType;
     it.permissions = session.permissions;
     return it;
+  }
+
+  static toPlainObject(user: User & { role: Role }) {
+    return {
+      id: user.id,
+      roleId: user.roleId,
+      roleType: user.roleType,
+      permissions: user.role.permissions,
+    } as UserSessionDto;
   }
 }
