@@ -47,15 +47,10 @@ export class AuthService {
     });
   }
 
-  generateTokens(model: User & { role: Role }) {
-    return this.securityService.generateTokens(model);
-  }
-
-  async setRefreshToken(
-    userId: UserIdentifier,
-    token: Pick<User, 'refreshToken'>['refreshToken'],
-  ) {
-    return await this.usersRepo.setRefreshToken(userId, token);
+  async authenticate(user: User & { role: Role }) {
+    const tokens = this.securityService.generateTokens(user);
+    await this.usersRepo.setRefreshToken(user.id, tokens.refreshToken);
+    return tokens;
   }
 
   async signout(userId: UserIdentifier) {

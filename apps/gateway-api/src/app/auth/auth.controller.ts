@@ -33,11 +33,7 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserCreationFailed);
     }
 
-    const tokens = this.authService.generateTokens(newUserEntity);
-    await this.authService.setRefreshToken(
-      newUserEntity.id,
-      tokens.refreshToken,
-    );
+    const tokens = await this.authService.authenticate(newUserEntity);
 
     return AuthDto.from({
       ...tokens,
@@ -56,8 +52,7 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserNotExists);
     }
 
-    const tokens = this.authService.generateTokens(userEntity);
-    await this.authService.setRefreshToken(userEntity.id, tokens.refreshToken);
+    const tokens = await this.authService.authenticate(userEntity);
 
     return AuthDto.from({
       ...tokens,
