@@ -13,6 +13,15 @@ export class UsersRepo {
     });
   }
 
+  async findOneByEmailAndPassword(
+    email: Pick<User, 'email'>['email'],
+    password: Pick<User, 'password'>['password'],
+  ) {
+    return await this.prisma.user.findUnique({
+      where: { email, password },
+    });
+  }
+
   async createOne(
     user: Pick<
       User,

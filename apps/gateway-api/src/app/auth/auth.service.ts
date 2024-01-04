@@ -18,6 +18,14 @@ export class AuthService {
     return await this.usersRepo.findOneByEmail(email);
   }
 
+  async findUserByEmailAndPassword(user: Pick<User, 'email' | 'password'>) {
+    const hashedPassword = await this.securityService.hashPassword(
+      user.password,
+    );
+
+    return this.usersRepo.findOneByEmailAndPassword(user.email, hashedPassword);
+  }
+
   async makeNewUser(
     user: Pick<User, 'email' | 'password' | 'firstName' | 'lastName'>,
   ) {
