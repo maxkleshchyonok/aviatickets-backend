@@ -4,6 +4,7 @@ import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { RolesRepo } from 'api/domain/repos/roles.repo';
 import { UsersRepo } from 'api/domain/repos/users.repo';
 import { SecurityService } from 'api/libs/security/security.service';
+import { UserIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()
 export class AuthService {
@@ -41,5 +42,12 @@ export class AuthService {
 
   generateTokens(payload: UserSessionDto) {
     return this.securityService.generateTokens(payload);
+  }
+
+  async setRefreshToken(
+    userId: UserIdentifier,
+    token: Pick<User, 'refreshToken'>['refreshToken'],
+  ) {
+    return await this.usersRepo.setRefreshToken(userId, token);
   }
 }

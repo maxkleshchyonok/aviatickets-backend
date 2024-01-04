@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'api/libs/prisma/prisma.service';
+import { UserIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()
 export class UsersRepo {
@@ -20,6 +21,16 @@ export class UsersRepo {
   ) {
     return await this.prisma.user.create({
       data: { ...user },
+    });
+  }
+
+  async setRefreshToken(
+    id: UserIdentifier,
+    refreshToken: Pick<User, 'refreshToken'>['refreshToken'],
+  ) {
+    return await this.prisma.user.update({
+      where: { id },
+      data: { refreshToken },
     });
   }
 }

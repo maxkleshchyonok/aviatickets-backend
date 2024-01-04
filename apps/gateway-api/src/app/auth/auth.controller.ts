@@ -23,5 +23,14 @@ export class AuthController {
     if (!newUserEntity) {
       throw new InternalServerErrorException(ErrorMessage.UserCreationFailed);
     }
+
+    const payload = {
+      id: newUserEntity.id,
+      roleId: newUserEntity.roleId,
+      roleType: newUserEntity.roleType,
+    };
+
+    const tokens = this.authService.generateTokens(payload);
+    await this.authService.setRefreshToken(payload.id, tokens.refreshToken);
   }
 }
