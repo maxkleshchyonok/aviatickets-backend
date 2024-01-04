@@ -1,11 +1,18 @@
 import {
   Body,
   Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
   InternalServerErrorException,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthDto } from 'api/domain/dto/auth.dto';
+import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { ErrorMessage } from 'api/enums/error-message.enum';
+import { CurrentUser } from 'api/libs/security/decorators/current-user.decorator';
+import { AccessTokenGuard } from 'api/libs/security/guards/access-token.guard';
 import { AuthService } from './auth.service';
 import { SignInForm } from './dto/signin.form';
 import { SignUpForm } from './dto/signup.form';
@@ -65,5 +72,12 @@ export class AuthController {
       ...tokens,
       user: userEntity,
     });
+  }
+
+  @Get('signout')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async signout(@CurrentUser() user: UserSessionDto) {
+    await this.authService.signout(user.id);
   }
 }

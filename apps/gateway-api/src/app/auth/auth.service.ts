@@ -58,4 +58,8 @@ export class AuthService {
   ) {
     return await this.usersRepo.setRefreshToken(userId, token);
   }
+
+  async signout(userId: UserIdentifier) {
+    return await this.usersRepo.deleteRefreshToken(userId);
+  }
 }
