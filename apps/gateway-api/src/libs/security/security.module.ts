@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { SecurityService } from './security.service';
+import { AccessTokenStrategy } from './strategies/access-token.strategy';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { SecurityService } from './security.service';
       useFactory: (config: ConfigService) => config.get('security'),
     }),
   ],
-  providers: [SecurityService],
+  providers: [SecurityService, AccessTokenStrategy],
   exports: [SecurityService],
 })
 export class SecurityModule {}
