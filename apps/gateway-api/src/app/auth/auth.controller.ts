@@ -7,6 +7,7 @@ import {
 import { AuthDto } from 'api/domain/dto/auth.dto';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { AuthService } from './auth.service';
+import { SignInForm } from './dto/signin.form';
 import { SignUpForm } from './dto/signup.form';
 
 @Controller('auth')
@@ -37,6 +38,32 @@ export class AuthController {
     return AuthDto.from({
       ...tokens,
       user: newUserEntity,
+    });
+  }
+
+  @Post('signin')
+  async signin(@Body() body: SignInForm) {
+    const userEntity = await this.authService.findUserByEmailAndPassword({
+      email: body.email,
+      password: body.password,
+    });
+
+    if (!userEntity) {
+      throw new InternalServerErrorException(ErrorMessage.UserNotExists);
+    }
+
+    const payload = {
+      id: userEntity.id,
+      roleId: userEntity.roleId,
+      roleType: userEntity.roleType,
+    };
+
+    const tokens = this.authService.generateTokens(payload);
+    await this.authService.setRefreshToken(payload.id, tokens.refreshToken);
+
+    return AuthDto.from({
+      ...tokens,
+      user: userEntity,
     });
   }
 }
