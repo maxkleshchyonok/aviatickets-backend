@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { RoleTypes, User } from '@prisma/client';
-import { RolesRepo } from '../../domain/repos/roles.repo';
-import { UsersRepo } from '../../domain/repos/users.repo';
-import { SecurityService } from '../../libs/security/security.service';
+import { RolesRepo } from 'api/domain/repos/roles.repo';
+import { UsersRepo } from 'api/domain/repos/users.repo';
+import { SecurityService } from 'api/libs/security/security.service';
 
 @Injectable()
 export class AuthService {

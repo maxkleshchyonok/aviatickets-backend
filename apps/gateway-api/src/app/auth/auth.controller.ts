@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   Post,
 } from '@nestjs/common';
-import { ErrorMessage } from '../../enums/error-message.enum';
+import { ErrorMessage } from 'api/enums/error-message.enum';
 import { AuthService } from './auth.service';
 import { SignUpForm } from './dto/signup.form';
 

@@ -1,5 +1,5 @@
 import { IsEmail, IsString, Matches } from 'class-validator';
-import { RemoveExtraSpaces } from '../../../decorators/remove-extra-spaces.decorator';
+import { RemoveExtraSpaces } from 'api/decorators/remove-extra-spaces.decorator';
 import { STRONG_PASSWORD_REG_EXP } from '../constants/auth.constants';
 
 export class SignUpForm {
