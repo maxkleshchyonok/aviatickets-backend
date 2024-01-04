@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   Post,
 } from '@nestjs/common';
+import { AuthDto } from 'api/domain/dto/auth.dto';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { AuthService } from './auth.service';
 import { SignUpForm } from './dto/signup.form';
@@ -32,5 +33,10 @@ export class AuthController {
 
     const tokens = this.authService.generateTokens(payload);
     await this.authService.setRefreshToken(payload.id, tokens.refreshToken);
+
+    return AuthDto.from({
+      ...tokens,
+      user: newUserEntity,
+    });
   }
 }
