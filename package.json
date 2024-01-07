@@ -9,6 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "prisma:format": "npx prisma format",
+    "seed": "ts-node apps/gateway-api/prisma/seed.ts",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -24,6 +25,7 @@
     "test:e2e": "jest --config ./apps/aviatickets-backend/test/jest-e2e.json"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.3.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.0.0",
