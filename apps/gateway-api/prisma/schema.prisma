@@ -7,88 +7,126 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserPermissions {
+  All @map("permissions.all")
+}
+
+enum RoleTypes {
+  Admin @map("admin")
+  User  @map("user")
+  Sales @map("sales")
+}
+
+model Role {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  type        RoleTypes
+  permissions UserPermissions[]
+
+  users User[]
+
+  @@unique([id, type])
+  @@map("roles")
+}
+
 model User {
-  id           String    @unique @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   firstName    String    @map("first_name")
   lastName     String    @map("last_name")
   email        String    @unique
-  role         String
+  roleType     RoleTypes @default(User) @map("role_type")
   password     String
   refreshToken String?   @map("refresh_token")
-  bookings     Booking[]
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updateAt     DateTime  @updatedAt @map("updated_at")
+
+  booking Booking[]
+  role     Role      @relation(fields: [roleId], references: [id])
+  roleId   String    @db.Uuid
 
   @@map("users")
 }
 
 model Ticket {
-  id         String    @id @default(uuid()) @db.Uuid
-  flightId   String    @map("flight_id") @db.Uuid
-  flight     Flight    @relation(fields: [flightId], references: [id])
-  seatsStock Int       @map("seats_stock")
-  booking    Booking[]
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  seatsStock Int    @map("seats_stock")
   price      Int
   type       String
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updateAt   DateTime  @updatedAt @map("updated_at")
+
+  booking  Booking[]
+  flightId String    @map("flight_id") @db.Uuid
+  flight   Flight    @relation(fields: [flightId], references: [id])
 
   @@map("tickets")
 }
 
 model Booking {
-  id        String      @id @default(uuid()) @db.Uuid
-  status    String
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  status String
+
   ticketId  String      @map("ticket_id") @db.Uuid
   ticket    Ticket      @relation(fields: [ticketId], references: [id])
   userId    String      @map("user_id") @db.Uuid
   user      User        @relation(fields: [userId], references: [id])
   passenger Passenger[]
-  createdAt DateTime    @default(now()) @map("created_at")
-  updateAt  DateTime    @updatedAt @map("updated_at")
 
   @@map("bookings")
 }
 
 model Passenger {
   id        String   @id @default(uuid()) @db.Uuid
-  bookingId String   @map("booking_id") @db.Uuid
-  booking   Booking  @relation(fields: [bookingId], references: [id])
-  firstName String   @map("first_name")
-  lastName  String   @map("last_name")
-  passport  String   @unique
   createdAt DateTime @default(now()) @map("created_at")
-  updateAt  DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  firstName String @map("first_name")
+  lastName  String @map("last_name")
+  passport  String @unique
+
+  bookingId String  @map("booking_id") @db.Uuid
+  booking   Booking @relation(fields: [bookingId], references: [id])
 
   @@map("passengers")
 }
 
 model Flight {
-  id          String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   origin      String
   destination String
-  plane       Plane    @relation(fields: [planeId], references: [id])
   departure   DateTime
   arrival     DateTime
-  tickets     Ticket[]
   status      String
   price       Int
-  planeId     String   @map("plane_id") @db.Uuid
-  createdAt   DateTime @default(now()) @map("created_at")
-  updateAt    DateTime @updatedAt @map("updated_at")
+
+  tickets Ticket[]
+  plane   Plane    @relation(fields: [planeId], references: [id])
+  planeId String   @map("plane_id") @db.Uuid
 
   @@map("flights")
 }
 
 model Plane {
   id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  capacity  Int
-  image     String
-  carrier   String
-  flights   Flight[]
   createdAt DateTime @default(now()) @map("created_at")
-  updateAt  DateTime @updatedAt @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name     String
+  capacity Int
+  image    String
+  carrier  String
+
+  flights Flight[]
 
   @@map("planes")
 }
