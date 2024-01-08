@@ -1,12 +1,12 @@
-import { Flight } from '@prisma/client';
+import { Cities, Flight, FlightStatuses } from '@prisma/client';
 import { UUIDDto } from './uuid.dto';
 
 export class FlightDto extends UUIDDto {
-  originCity: string;
-  destinationCity: string;
+  originCity: Cities;
+  destinationCity: Cities;
   departureTime: number;
   arrivalTime: number;
-  status: string;
+  status: FlightStatuses;
   price: number;
 
   static fromEntity(entity?: Flight) {
@@ -18,8 +18,8 @@ export class FlightDto extends UUIDDto {
     it.id = entity.id;
     it.createdAt = entity.createdAt.valueOf();
     it.updatedAt = entity.updatedAt.valueOf();
-    it.originCity = entity.originCity.replace(/_/g, ' ');
-    it.destinationCity = entity.destinationCity.replace(/_/g, ' ');
+    it.originCity = entity.originCity;
+    it.destinationCity = entity.destinationCity;
     it.arrivalTime = entity.arrivalTime.valueOf();
     it.departureTime = entity.departureTime.valueOf();
     it.status = entity.status;
