@@ -13,9 +13,10 @@ class TwoWayRouteDto {
     toOriginRoute: RouteDto | null = null,
   ) {
     const it = new TwoWayRouteDto();
-    const flight = toDestinationRoute.flights[0];
-    it.originCity = flight.originCity;
-    it.destinationCity = flight.destinationCity;
+    const firstFlight = toDestinationRoute.flights.at(0);
+    const lastFlight = toDestinationRoute.flights.at(-1);
+    it.originCity = firstFlight.originCity;
+    it.destinationCity = lastFlight.destinationCity;
     it.toDestinationRoute = toDestinationRoute;
     it.toOriginRoute = toOriginRoute;
     it.price =
