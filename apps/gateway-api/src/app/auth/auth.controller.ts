@@ -16,6 +16,7 @@ import { JwtPermissionsGuard } from 'api/libs/security/guards/jwt-permissions.gu
 import { AuthService } from './auth.service';
 import { SignInForm } from './dto/signin.form';
 import { SignUpForm } from './dto/signup.form';
+import { env } from 'process';
 
 @Controller('auth')
 export class AuthController {
