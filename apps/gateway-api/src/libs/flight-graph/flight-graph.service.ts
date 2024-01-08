@@ -10,10 +10,31 @@ export class FlightGraphService {
     this.vertices = new Map<Flight, Flight[]>();
   }
 
+  buildGraph(flights: Flight[]) {
+    const vertices = this.vertices;
+
+    this.addVertices(flights);
+
+    vertices.forEach((value, vertex) => {
+      const appropriateFlights = flights.filter(
+        (flight) => flight.originCity === vertex.destinationCity,
+      );
+      this.addEdges(vertex, appropriateFlights);
+    });
+  }
+
+  addVertices(vertices: Flight[]) {
+    vertices.forEach((vertex) => this.addVertex(vertex));
+  }
+
   addVertex(vertex: Flight) {
     if (!this.vertices.get(vertex)) {
       this.vertices.set(vertex, []);
     }
+  }
+
+  addEdges(vertex1: Flight, vertices: Flight[]) {
+    vertices.forEach((vertex) => this.addEdge(vertex1, vertex));
   }
 
   addEdge(vertex1: Flight, vertex2: Flight) {
