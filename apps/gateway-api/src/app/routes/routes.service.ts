@@ -14,8 +14,14 @@ export class RoutesService {
       query.destinationCity,
     );
 
-    const toDestinationRoutesDto = RouteDto.fromRoutes(toDestinationRoutes);
+    const toDestinationRoutesDto = this.sortRoutesByPrice(
+      RouteDto.fromRoutes(toDestinationRoutes),
+    );
 
     return RoutesDto.fromRoutes(toDestinationRoutesDto);
+  }
+
+  private sortRoutesByPrice(routes: RouteDto[]) {
+    return routes.sort((flight1, flight2) => flight1.price - flight2.price);
   }
 }
