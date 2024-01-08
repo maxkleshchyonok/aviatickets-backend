@@ -3,7 +3,7 @@ import { Flight } from '@prisma/client';
 import { Route } from 'api/types/route.type';
 
 @Injectable()
-export class FlightGraph {
+export class FlightGraphService {
   vertices: Map<Flight, Flight[]>;
 
   constructor() {
