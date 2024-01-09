@@ -16,7 +16,7 @@ import { JwtPermissionsGuard } from 'api/libs/security/guards/jwt-permissions.gu
 import { AuthService } from './auth.service';
 import { SignInForm } from './dto/signin.form';
 import { SignUpForm } from './dto/signup.form';
-import { env } from 'process';
+import { ForgotForm } from './dto/forgot.form';
 
 @Controller('auth')
 export class AuthController {
@@ -66,5 +66,10 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
     await this.authService.signout(user.id);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: ForgotForm) {
+    await this.authService.sendPasswordResetEmail(body.email);
   }
 }

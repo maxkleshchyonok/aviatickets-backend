@@ -11,7 +11,7 @@ export class SecurityService {
   constructor(
     private readonly config: ConfigService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async hashPassword(password: string) {
     const hash = crypto.createHash('MD5');
@@ -43,4 +43,25 @@ export class SecurityService {
 
     return { accessToken, refreshToken };
   }
+
+  generateResetToken() {
+    //const securityConfig = this.config.get<SecurityConfig>('security');
+    //const { secret: resetSecret, expiresIn } = securityConfig.resetTokenOptions;
+
+    // const resetToken = jwt.sign({}, resetSecret, {
+    //   expiresIn,
+    // });
+    const randomResetCode = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+
+    const payload = {
+      code: randomResetCode,
+    }
+
+    const secret = 'secret';
+
+    const resetToken = this.jwtService.sign(payload, { secret: secret, expiresIn: '5m' });
+
+    return { resetToken, randomResetCode };
+  }
+
 }
