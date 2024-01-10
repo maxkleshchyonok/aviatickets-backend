@@ -41,13 +41,13 @@ export class FlightGraphService {
     this.vertices.get(vertex1).push(vertex2);
   }
 
-  findRoutes(originCity, destinationCity) {
+  findRoutes(originCity: string, destinationCity: string, departureTime: Date) {
     const routes: Route[] = [];
-    const visited = new Set();
+    const visited = new Set<string>();
 
     const flightVertices = Array.from<Flight>(this.vertices.keys());
 
-    function dfs(city, route, arrivalTime) {
+    function dfs(city: string, route: Flight[], arrivalTime: Date) {
       visited.add(city);
 
       if (city === destinationCity) {
@@ -73,7 +73,10 @@ export class FlightGraphService {
     }
 
     const flightsFromOriginCity = flightVertices.filter(
-      (flight) => flight.originCity === originCity,
+      (flight) =>
+        flight.originCity === originCity &&
+        flight.departureTime.toLocaleDateString() ===
+          departureTime.toLocaleDateString(),
     );
 
     for (const flight of flightsFromOriginCity) {
