@@ -8,10 +8,7 @@ CREATE TYPE "RoleTypes" AS ENUM ('admin', 'user', 'sales');
 CREATE TYPE "FlightStatuses" AS ENUM ('planned', 'completed');
 
 -- CreateEnum
-CREATE TYPE "TicketTypes" AS ENUM ('economy', 'business');
-
--- CreateEnum
-CREATE TYPE "Cities" AS ENUM ('Kabul', 'Tirana', 'Algiers', 'Andorra la Vella', 'Luanda', 'Buenos Aires', 'Yerevan', 'Canberra', 'Vienna', 'Baku', 'Nassau', 'Manama', 'Dhaka', 'Bridgetown', 'Minsk', 'Brussels', 'Belmopan', 'Thimphu', 'La Paz', 'Sarajevo', 'Gaborone', 'Bandar Seri Begawan', 'Sofia', 'Ouagadougou', 'Gitega', 'Phnom Penh', 'Yaounde', 'Ottawa', 'Praia', 'Bangui', 'Santiago', 'Beijing', 'Bogota', 'Moroni', 'Brazzaville', 'Kinshasa', 'San Jose', 'Yamoussoukro', 'Zagreb', 'Havana', 'Nicosia', 'Prague', 'Copenhagen', 'Djibouti', 'Roseau', 'Santo domingo', 'Dili', 'Quito', 'Cairo', 'San Salvador', 'Malabo', 'Asmara', 'Tallinn', 'Addis Ababa', 'Suva', 'Helsinki', 'Paris', 'Libreville', 'Banjul', 'Tbilisi', 'Berlin', 'Accra', 'Athens', 'Saint Georges', 'Conakry', 'Bissau', 'Georgetown', 'Tegucigalpa', 'Budapest', 'Antananarivo', 'Lilongwe', 'Kuala Lumpur', 'Male', 'Bamako', 'Valletta', 'Majuro', 'Nouakchott', 'Palikir', 'Chisinau', 'Monaco', 'Ulaanbaatar', 'Podgorica', 'Rabat', 'Maputo', 'Rangoon', 'Windhoek', 'Kathmandu', 'Amsterdam', 'Wellington', 'Managua', 'Niamey', 'Abuja', 'Oslo', 'Muscat', 'Islamabad', 'Melekeok', 'Port Moresby', 'Asuncion', 'Lima', 'Manila', 'Warsaw', 'Lisbon', 'Doha', 'Bucharest', 'Moscow', 'Kigali', 'Basseterre', 'Castries', 'Kingstown', 'Apia', 'San Marino');
+CREATE TYPE "Cities" AS ENUM ('Tirana', 'Algiers', 'Vienna', 'Baku', 'Nassau', 'Manama', 'Dhaka', 'Bridgetown', 'Minsk', 'Brussels', 'Belmopan', 'Gaborone', 'Sofia', 'Moroni', 'Brazzaville', 'Havana', 'Nicosia', 'Prague', 'Copenhagen', 'Cairo', 'Malabo', 'Tallinn', 'Helsinki', 'Paris', 'Libreville', 'Tbilisi', 'Berlin', 'Conakry', 'Bissau', 'Georgetown', 'Budapest', 'Bamako', 'Valletta', 'Monaco', 'Rabat', 'Maputo', 'Amsterdam', 'Wellington', 'Managua', 'Abuja', 'Oslo', 'Muscat', 'Lima', 'Manila', 'Warsaw', 'Lisbon', 'Doha', 'Bucharest', 'Moscow', 'Kigali', 'Basseterre');
 
 -- CreateTable
 CREATE TABLE "roles" (
@@ -41,25 +38,12 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
-CREATE TABLE "tickets" (
-    "id" UUID NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-    "seats_stock" INTEGER NOT NULL,
-    "price" INTEGER NOT NULL,
-    "type" "TicketTypes" NOT NULL,
-    "flight_id" UUID NOT NULL,
-
-    CONSTRAINT "tickets_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "bookings" (
     "id" UUID NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "status" TEXT NOT NULL,
-    "ticket_id" UUID NOT NULL,
+    "flight_id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
 
     CONSTRAINT "bookings_pkey" PRIMARY KEY ("id")
@@ -89,6 +73,8 @@ CREATE TABLE "flights" (
     "arrival_time" TIMESTAMP(3) NOT NULL,
     "status" "FlightStatuses" NOT NULL,
     "price" INTEGER NOT NULL,
+    "seat_amount" INTEGER NOT NULL,
+    "available_seat_amount" INTEGER NOT NULL,
     "plane_id" UUID NOT NULL,
 
     CONSTRAINT "flights_pkey" PRIMARY KEY ("id")
@@ -119,10 +105,7 @@ CREATE UNIQUE INDEX "passengers_passport_id_key" ON "passengers"("passport_id");
 ALTER TABLE "users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "tickets" ADD CONSTRAINT "tickets_flight_id_fkey" FOREIGN KEY ("flight_id") REFERENCES "flights"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "bookings" ADD CONSTRAINT "bookings_ticket_id_fkey" FOREIGN KEY ("ticket_id") REFERENCES "tickets"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "bookings" ADD CONSTRAINT "bookings_flight_id_fkey" FOREIGN KEY ("flight_id") REFERENCES "flights"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "bookings" ADD CONSTRAINT "bookings_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
