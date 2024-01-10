@@ -6,6 +6,12 @@ const prisma = new PrismaClient();
 
 type MockFlight = Omit<Flight, 'id' | 'createdAt' | 'updatedAt' | 'planeId'>;
 
+function getRandomInt(leftBoundary: number, rightBoundary: number): number {
+  const min = Math.ceil(leftBoundary);
+  const max = Math.floor(rightBoundary);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 async function createFlights(quantity: number) {
   const cities = Object.values(Cities);
   const flights: MockFlight[] = [];
@@ -13,27 +19,33 @@ async function createFlights(quantity: number) {
   for (let i = 0; i < quantity; i++) {
     const departureTime = faker.date.soon({
       days: 60,
-      refDate: '2024-01-01T00:00:00.000Z',
+      refDate: '2024-01-15T00:00:00.000Z',
     });
+
     const arrivalTime = new Date(
       departureTime.getTime() + randomInt(1, 15) * 60 * 60 * 1000,
     );
 
-    const temp = cities;
-    const originCity = temp.sort(() => 0.5 - Math.random())[0];
-    let destinationCity: Cities | null = null;
+    const originCityIndex = getRandomInt(0, cities.length - 1);
+    let destinationCityIndex = getRandomInt(0, cities.length - 1);
 
     do {
-      destinationCity = temp.sort(() => 0.5 - Math.random())[0];
-    } while (destinationCity === originCity);
+      destinationCityIndex = getRandomInt(0, cities.length - 1);
+    } while (destinationCityIndex === originCityIndex);
+
+    const price = getRandomInt(10, 1000);
+    const seatAmount = getRandomInt(10, 350);
+    const availableSeatAmount = getRandomInt(1, seatAmount);
 
     const flight: MockFlight = {
-      originCity,
-      destinationCity,
+      originCity: cities[originCityIndex],
+      destinationCity: cities[destinationCityIndex],
       departureTime,
       arrivalTime,
       status: FlightStatuses.Planned,
-      price: Math.floor(Math.random() * 1000),
+      price,
+      seatAmount,
+      availableSeatAmount,
     };
 
     flights.push(flight);
@@ -43,7 +55,7 @@ async function createFlights(quantity: number) {
 }
 
 async function main() {
-  await createFlights(1000);
+  await createFlights(400);
 }
 
 main()
