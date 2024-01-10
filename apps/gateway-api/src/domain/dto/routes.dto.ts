@@ -1,4 +1,5 @@
 import { Cities } from '@prisma/client';
+import { JourneyTypes } from 'api/enums/journey-types.enum';
 import { RouteDto } from './route.dto';
 
 class TwoWayRouteDto {
@@ -32,7 +33,7 @@ class TwoWayRouteDto {
     const areThereOriginRoutes = Boolean(toOriginRoutes.length);
 
     if (!toDestinationRoutes.length) {
-      return;
+      return [];
     }
 
     const routes = toDestinationRoutes
@@ -57,20 +58,33 @@ export class RoutesDto {
   static fromRoutes(
     toDestinationRoutes: RouteDto[],
     toOriginRoutes: RouteDto[] = [],
+    journeyType: JourneyTypes,
   ) {
-    const toDestinationRoutesCount = toDestinationRoutes.length;
-    const toOriginRoutesCount = toOriginRoutes.length;
-    const areThereToOriginRoutes = Boolean(toOriginRoutesCount);
+    const toDestinationRouteAmount = toDestinationRoutes.length;
+    const toOriginRouteAmount = toOriginRoutes.length;
 
-    if (!toDestinationRoutesCount) {
-      return;
+    const oneOfRouteArraysIsEmpty =
+      !toDestinationRouteAmount || !toOriginRouteAmount;
+
+    if (
+      (journeyType === JourneyTypes.Round_trip && oneOfRouteArraysIsEmpty) ||
+      (journeyType === JourneyTypes.One_way && !toDestinationRouteAmount)
+    ) {
+      const it = new RoutesDto();
+      it.count = 0;
+      it.routes = [];
+      return it;
+    }
+
+    if (journeyType === JourneyTypes.One_way) {
+      const it = new RoutesDto();
+      it.count = toDestinationRouteAmount;
+      it.routes = TwoWayRouteDto.fromRoutes(toDestinationRoutes);
+      return it;
     }
 
     const it = new RoutesDto();
-    it.count =
-      toDestinationRoutesCount *
-      (areThereToOriginRoutes ? toOriginRoutesCount : 1);
-
+    it.count = toDestinationRouteAmount * toOriginRouteAmount;
     it.routes = TwoWayRouteDto.fromRoutes(toDestinationRoutes, toOriginRoutes);
     return it;
   }

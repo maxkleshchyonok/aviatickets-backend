@@ -28,10 +28,6 @@ export class RouteDto extends UUIDDto {
   }
 
   static fromRoutes(routes: Route[]) {
-    if (!routes.length) {
-      return;
-    }
-
     return routes.map((route) => this.fromRoute(route));
   }
 }
