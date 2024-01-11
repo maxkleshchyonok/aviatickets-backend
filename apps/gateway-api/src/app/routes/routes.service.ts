@@ -10,7 +10,7 @@ export class RoutesService {
   constructor(private flightGraph: FlightGraphService) {}
 
   findRoutes(query: GetRoutesQueryDto) {
-    const { originCity, destinationCity, arrivalTime } = query;
+    const { originCity, destinationCity, arrivalTime, passengerAmount } = query;
 
     let journeyType: JourneyTypes = JourneyTypes.One_way;
     if (arrivalTime) {
@@ -30,6 +30,7 @@ export class RoutesService {
         originCity: destinationCity,
         destinationCity: originCity,
         departureTime: arrivalTime,
+        passengerAmount,
       });
 
       toOriginRoutesDto = this.sortRoutesByPrice(

@@ -6,6 +6,7 @@ interface FindRouteOptions {
   originCity: string;
   destinationCity: string;
   departureTime: Date;
+  passengerAmount: number;
 }
 
 @Injectable()
@@ -48,7 +49,8 @@ export class FlightGraphService {
   }
 
   findRoutes(options: FindRouteOptions) {
-    const { originCity, destinationCity, departureTime } = options;
+    const { originCity, destinationCity, departureTime, passengerAmount } =
+      options;
     const routes: Route[] = [];
     const visited = new Set<string>();
 
@@ -61,7 +63,9 @@ export class FlightGraphService {
         routes.push(route.slice());
       } else {
         const flightsFromCurrentCity = flightVertices.filter(
-          (flight) => flight.originCity === city,
+          (flight) =>
+            flight.originCity === city &&
+            flight.availableSeatAmount >= passengerAmount,
         );
 
         for (const flight of flightsFromCurrentCity) {
@@ -83,7 +87,8 @@ export class FlightGraphService {
       (flight) =>
         flight.originCity === originCity &&
         flight.departureTime.toLocaleDateString() ===
-          departureTime.toLocaleDateString(),
+          departureTime.toLocaleDateString() &&
+        flight.availableSeatAmount >= passengerAmount,
     );
 
     for (const flight of flightsFromOriginCity) {
