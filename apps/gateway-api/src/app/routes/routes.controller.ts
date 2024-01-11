@@ -7,8 +7,8 @@ export class RoutesController {
   constructor(private readonly routesService: RoutesService) {}
 
   @Get()
-  getRoutes(@Query() query: GetRoutesQueryDto) {
-    const routes = this.routesService.findRoutes(query);
+  async getRoutes(@Query() query: GetRoutesQueryDto) {
+    const routes = await this.routesService.findRoutes(query);
     return routes;
   }
 }

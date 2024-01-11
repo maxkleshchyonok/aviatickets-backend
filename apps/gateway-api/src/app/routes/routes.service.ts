@@ -3,13 +3,14 @@ import { RouteDto } from 'api/domain/dto/route.dto';
 import { RoutesDto } from 'api/domain/dto/routes.dto';
 import { JourneyTypes } from 'api/enums/journey-types.enum';
 import { FlightGraphService } from 'api/libs/flight-graph/flight-graph.service';
+import { Route } from 'api/types/route.type';
 import { GetRoutesQueryDto } from './domain/get-routes-query.dto';
 
 @Injectable()
 export class RoutesService {
   constructor(private flightGraph: FlightGraphService) {}
 
-  findRoutes(query: GetRoutesQueryDto) {
+  async findRoutes(query: GetRoutesQueryDto) {
     const { originCity, destinationCity, arrivalTime, passengerAmount } = query;
 
     let journeyType: JourneyTypes = JourneyTypes.One_way;
@@ -17,26 +18,30 @@ export class RoutesService {
       journeyType = JourneyTypes.Round_trip;
     }
 
-    const toDestinationRoutes = this.flightGraph.findRoutes(query);
-    const toDestinationRoutesDto = this.sortRoutesByPrice(
-      RouteDto.fromRoutes(toDestinationRoutes),
-    );
-
-    let toOriginRoutes = [];
-    let toOriginRoutesDto = [];
+    const toDestinationRoutesPromise = this.flightGraph.findRoutes(query);
+    let toOriginRoutesPromise = [] as unknown as Promise<Route[]>;
 
     if (journeyType === JourneyTypes.Round_trip) {
-      toOriginRoutes = this.flightGraph.findRoutes({
+      toOriginRoutesPromise = this.flightGraph.findRoutes({
         originCity: destinationCity,
         destinationCity: originCity,
         departureTime: arrivalTime,
         passengerAmount,
       });
-
-      toOriginRoutesDto = this.sortRoutesByPrice(
-        RouteDto.fromRoutes(toOriginRoutes),
-      );
     }
+
+    const [toDestinationRoutes, toOriginRoutes] = await Promise.all([
+      toDestinationRoutesPromise,
+      toOriginRoutesPromise,
+    ]);
+
+    const toDestinationRoutesDto = this.sortRoutesByPrice(
+      RouteDto.fromRoutes(toDestinationRoutes),
+    );
+
+    const toOriginRoutesDto = this.sortRoutesByPrice(
+      RouteDto.fromRoutes(toOriginRoutes),
+    );
 
     return RoutesDto.fromRoutes(
       toDestinationRoutesDto,

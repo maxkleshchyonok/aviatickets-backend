@@ -48,53 +48,55 @@ export class FlightGraphService {
     this.vertices.get(vertex1).push(vertex2);
   }
 
-  findRoutes(options: FindRouteOptions) {
-    const { originCity, destinationCity, departureTime, passengerAmount } =
-      options;
-    const routes: Route[] = [];
-    const visited = new Set<string>();
+  async findRoutes(options: FindRouteOptions): Promise<Route[]> {
+    return new Promise((resolve) => {
+      const { originCity, destinationCity, departureTime, passengerAmount } =
+        options;
+      const routes: Route[] = [];
+      const visited = new Set<string>();
 
-    const flightVertices = Array.from<Flight>(this.vertices.keys());
+      const flightVertices = Array.from<Flight>(this.vertices.keys());
 
-    function dfs(city: string, route: Flight[], arrivalTime: Date) {
-      visited.add(city);
+      function dfs(city: string, route: Flight[], arrivalTime: Date) {
+        visited.add(city);
 
-      if (city === destinationCity) {
-        routes.push(route.slice());
-      } else {
-        const flightsFromCurrentCity = flightVertices.filter(
-          (flight) =>
-            flight.originCity === city &&
-            flight.availableSeatAmount >= passengerAmount,
-        );
+        if (city === destinationCity) {
+          routes.push(route.slice());
+        } else {
+          const flightsFromCurrentCity = flightVertices.filter(
+            (flight) =>
+              flight.originCity === city &&
+              flight.availableSeatAmount >= passengerAmount,
+          );
 
-        for (const flight of flightsFromCurrentCity) {
-          if (
-            !visited.has(flight.destinationCity) &&
-            flight.departureTime >= arrivalTime
-          ) {
-            const newRoute = route.slice();
-            newRoute.push(flight);
-            dfs(flight.destinationCity, newRoute, flight.arrivalTime);
+          for (const flight of flightsFromCurrentCity) {
+            if (
+              !visited.has(flight.destinationCity) &&
+              flight.departureTime >= arrivalTime
+            ) {
+              const newRoute = route.slice();
+              newRoute.push(flight);
+              dfs(flight.destinationCity, newRoute, flight.arrivalTime);
+            }
           }
         }
+
+        visited.delete(city);
       }
 
-      visited.delete(city);
-    }
+      const flightsFromOriginCity = flightVertices.filter(
+        (flight) =>
+          flight.originCity === originCity &&
+          flight.departureTime.toLocaleDateString() ===
+            departureTime.toLocaleDateString() &&
+          flight.availableSeatAmount >= passengerAmount,
+      );
 
-    const flightsFromOriginCity = flightVertices.filter(
-      (flight) =>
-        flight.originCity === originCity &&
-        flight.departureTime.toLocaleDateString() ===
-          departureTime.toLocaleDateString() &&
-        flight.availableSeatAmount >= passengerAmount,
-    );
+      for (const flight of flightsFromOriginCity) {
+        dfs(flight.destinationCity, [flight], flight.arrivalTime);
+      }
 
-    for (const flight of flightsFromOriginCity) {
-      dfs(flight.destinationCity, [flight], flight.arrivalTime);
-    }
-
-    return routes;
+      return resolve(routes);
+    });
   }
 }
