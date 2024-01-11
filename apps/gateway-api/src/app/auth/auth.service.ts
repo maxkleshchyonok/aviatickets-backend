@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Role, RoleTypes, User } from '@prisma/client';
 import { RolesRepo } from 'api/domain/repos/roles.repo';
 import { UsersRepo } from 'api/domain/repos/users.repo';
@@ -60,18 +60,21 @@ export class AuthService {
     return await this.usersRepo.deleteRefreshToken(userId);
   }
 
-  async sendPasswordResetEmail(email: string) {
+  async sendPasswordResetCode(email: string) {
     const user = await this.usersRepo.findOneByEmail(email);
+
+    const { resetToken, randomResetCode } = this.securityService.generateResetToken();
 
     if (!user) {
       throw new Error(ErrorMessage.UserNotExists);
     }
 
-    const { resetToken, randomResetCode } = this.securityService.generateResetToken();
+    if (!user.refreshToken) {
+      await this.usersRepo.setRefreshToken(user.id, resetToken);
+    }
 
-    await this.sendEmail(user.email, randomResetCode);
+    return await this.sendEmail(user.email, randomResetCode);
 
-    return resetToken;
   }
 
   private async sendEmail(email: string, resetCode: number) {
@@ -94,4 +97,17 @@ export class AuthService {
 
     await transporter.sendMail(mailOptions);
   }
+
+  async verifyResetCode(resestData: Pick<User, 'email'> & { code: number }) {
+    const user = await this.usersRepo.findOneByEmail(resestData.email);
+    const decodedToken = await this.securityService.decodeToken({ refreshToken: user.refreshToken });
+
+    if (decodedToken.code === resestData.code) {
+      return true;
+    }
+    return false;
+  }
+
+  
+
 }

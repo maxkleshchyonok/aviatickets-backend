@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Role, User } from '@prisma/client';
 import { SecurityConfig } from 'api/config/security.config';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
+import { ErrorMessage } from 'api/enums/error-message.enum';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -45,23 +46,39 @@ export class SecurityService {
   }
 
   generateResetToken() {
-    //const securityConfig = this.config.get<SecurityConfig>('security');
-    //const { secret: resetSecret, expiresIn } = securityConfig.resetTokenOptions;
+    const securityConfig = this.config.get<SecurityConfig>('security');
+    const { secret: resetSecret, signOptions: resetSignOptions } =
+      securityConfig.resetTokenOptions;
 
-    // const resetToken = jwt.sign({}, resetSecret, {
-    //   expiresIn,
-    // });
-    const randomResetCode = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+    const min = 100000;
+    const max = 999999;
+    const randomResetCode = Math.floor(Math.random() * (max - min + 1)) + min;
 
     const payload = {
       code: randomResetCode,
     }
 
-    const secret = 'secret';
-
-    const resetToken = this.jwtService.sign(payload, { secret: secret, expiresIn: '5m' });
+    const resetToken = this.jwtService.sign(payload, {
+      secret: resetSecret,
+      ...resetSignOptions,
+    });
 
     return { resetToken, randomResetCode };
+  }
+
+  decodeToken(token: Pick<User, 'refreshToken'>) {
+    const securityConfig = this.config.get<SecurityConfig>('security');
+    const { secret: resetSecret } = securityConfig.resetTokenOptions;
+
+    try {
+      const decoded = this.jwtService.verify(token.refreshToken, {
+        secret: resetSecret,
+      });
+
+      return decoded;
+    } catch (error) {
+      throw new UnauthorizedException(ErrorMessage.BadResetToken);
+    }
   }
 
 }

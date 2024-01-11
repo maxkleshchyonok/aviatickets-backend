@@ -39,6 +39,15 @@ export class UsersRepo {
     });
   }
 
+  async setVerificationCode(id: UserIdentifier, code: string) {
+    return await this.prisma.user.update({
+      where: {id},
+      data: {
+        refreshToken: code
+      }
+    });
+  }
+
   async setRefreshToken(
     id: UserIdentifier,
     refreshToken: Pick<User, 'refreshToken'>['refreshToken'],

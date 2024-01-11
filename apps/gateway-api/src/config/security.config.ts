@@ -11,6 +11,10 @@ export interface SecurityConfig {
     secret: string;
     signOptions: SignOptions;
   };
+  resetTokenOptions: {
+    secret: string;
+    signOptions: SignOptions;
+  }
 }
 
 export default registerAs('security', () => {
@@ -18,8 +22,10 @@ export default registerAs('security', () => {
     .keys({
       ACCESS_TOKEN_SECRET: Joi.string().required(),
       REFRESH_TOKEN_SECRET: Joi.string().required(),
+      RESET_TOKEN_SECRET: Joi.string().required(),
       ACCESS_TOKEN_LIFETIME: Joi.string().default('1d').required(),
       REFRESH_TOKEN_LIFETIME: Joi.string().default('30d').required(),
+      RESET_TOKEN_LIFETIME: Joi.string().default('5m').required(),
     })
     .unknown();
 
@@ -44,5 +50,11 @@ export default registerAs('security', () => {
         expiresIn: envVars.REFRESH_TOKEN_LIFETIME,
       },
     },
+    resetTokenOptions: {
+      secret: envVars.RESET_TOKEN_SECRET,
+      signOptions: {
+        expiresIn: envVars.RESET_TOKEN_LIFETIME,
+      }
+    }
   } as SecurityConfig;
 });
