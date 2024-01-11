@@ -6,7 +6,7 @@ import { UsersRepo } from 'api/domain/repos/users.repo';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { SecurityService } from 'api/libs/security/security.service';
 import { UserIdentifier } from 'api/types/model-identifiers.types';
-import * as nodemailer from 'nodemailer';
+import { MailerService } from 'api/libs/mailer/mailer.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +14,7 @@ export class AuthService {
     private readonly usersRepo: UsersRepo,
     private readonly rolesRepo: RolesRepo,
     private readonly securityService: SecurityService,
+    private readonly mailerService: MailerService,
   ) { }
 
   async findUserByEmail(email: Pick<User, 'email'>['email']) {
@@ -73,29 +74,8 @@ export class AuthService {
       await this.usersRepo.setRefreshToken(user.id, resetToken);
     }
 
-    return await this.sendEmail(user.email, randomResetCode);
+    return await this.mailerService.sendEmail(user.email, randomResetCode);
 
-  }
-
-  private async sendEmail(email: string, resetCode: number) {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      port: 587,
-      secure: false,
-      auth: {
-        user: 'aviafinders@gmail.com',
-        pass: 'epun tshr rrpd zrhy',
-      },
-    });
-
-    const mailOptions = {
-      from: 'aviafinders@gmail.com',
-      to: email,
-      subject: 'Password Reset',
-      text: `Your verification code: ${resetCode}`,
-    };
-
-    await transporter.sendMail(mailOptions);
   }
 
   async verifyResetCode(resestData: Pick<User, 'email'> & { code: number }) {
@@ -108,6 +88,13 @@ export class AuthService {
     return false;
   }
 
-  
+  async resetPassword(data: Pick<User, 'email' | 'password'>) {
+    const hashedPassword = await this.securityService.hashPassword(data.password);
+    const resetData: Pick<User, 'email' | 'password'> = {
+      email: data.email,
+      password: hashedPassword,
+    }
+    return await this.usersRepo.resetPassword(resetData);
+  }
 
 }

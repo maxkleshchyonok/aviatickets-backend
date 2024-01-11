@@ -5,7 +5,7 @@ import { UserIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()
 export class UsersRepo {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findOneByEmail(email: Pick<User, 'email'>['email']) {
     return await this.prisma.user.findUnique({
@@ -39,9 +39,19 @@ export class UsersRepo {
     });
   }
 
+  async resetPassword(resetData: Pick<User, 'email' | 'password'>) {
+    return await this.prisma.user.update({
+      where: { email: resetData.email },
+      data: {
+        password: resetData.password,
+        refreshToken: null,
+      }
+    });
+  }
+
   async setVerificationCode(id: UserIdentifier, code: string) {
     return await this.prisma.user.update({
-      where: {id},
+      where: { id },
       data: {
         refreshToken: code
       }

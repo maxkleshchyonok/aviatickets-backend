@@ -82,7 +82,7 @@ export class AuthController {
 
   @Post('reset-password')
   async resetPassword(@Body() body: ResetForm) {
-    await this.authService
+    await this.authService.resetPassword(body);
   }
 
 }
