@@ -1,5 +1,6 @@
 import { Cities } from '@prisma/client';
 import { JourneyTypes } from 'api/enums/journey-types.enum';
+import { PaginationQueryDto } from './pagination-query.dto';
 import { RouteDto } from './route.dto';
 
 class TwoWayRouteDto {
@@ -59,6 +60,7 @@ export class RoutesDto {
     toDestinationRoutes: RouteDto[],
     toOriginRoutes: RouteDto[] = [],
     journeyType: JourneyTypes,
+    paginationOptions: PaginationQueryDto,
   ) {
     const toDestinationRouteAmount = toDestinationRoutes.length;
     const toOriginRouteAmount = toOriginRoutes.length;
@@ -85,7 +87,18 @@ export class RoutesDto {
 
     const it = new RoutesDto();
     it.count = toDestinationRouteAmount * toOriginRouteAmount;
-    it.routes = TwoWayRouteDto.fromRoutes(toDestinationRoutes, toOriginRoutes);
+    const routes = TwoWayRouteDto.fromRoutes(
+      toDestinationRoutes,
+      toOriginRoutes,
+    );
+    it.routes = paginateArray(routes, paginationOptions);
+
     return it;
   }
 }
+
+const paginateArray = (array: any[], paginationOptions: PaginationQueryDto) => {
+  const { pageNumber, pageSize } = paginationOptions;
+  const page = array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+  return page;
+};

@@ -11,7 +11,13 @@ export class RoutesService {
   constructor(private flightGraph: FlightGraphService) {}
 
   async findRoutes(query: GetRoutesQueryDto) {
-    const { originCity, destinationCity, arrivalTime, passengerAmount } = query;
+    const {
+      originCity,
+      destinationCity,
+      arrivalTime,
+      passengerAmount,
+      ...paginationOptions
+    } = query;
 
     let journeyType: JourneyTypes = JourneyTypes.One_way;
     if (arrivalTime) {
@@ -47,6 +53,7 @@ export class RoutesService {
       toDestinationRoutesDto,
       toOriginRoutesDto,
       journeyType,
+      paginationOptions,
     );
   }
 

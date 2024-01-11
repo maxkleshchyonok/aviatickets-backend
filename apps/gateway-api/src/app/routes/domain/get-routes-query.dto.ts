@@ -1,5 +1,6 @@
 import { Cities } from '@prisma/client';
 import { RemoveExtraSpaces } from 'api/decorators/remove-extra-spaces.decorator';
+import { PaginationQueryDto } from 'api/domain/dto/pagination-query.dto';
 import { Transform, Type } from 'class-transformer';
 import {
   IsDate,
@@ -16,7 +17,7 @@ export enum PassengerAmount {
   Max = 10,
 }
 
-export class GetRoutesQueryDto {
+export class GetRoutesQueryDto extends PaginationQueryDto {
   @IsEnum(Cities)
   @RemoveExtraSpaces()
   originCity: Cities;
