@@ -2,6 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { Flight } from '@prisma/client';
 import { Route } from 'api/types/route.type';
 
+interface FindRouteOptions {
+  originCity: string;
+  destinationCity: string;
+  departureTime: Date;
+}
+
 @Injectable()
 export class FlightGraphService {
   vertices: Map<Flight, Flight[]>;
@@ -41,7 +47,8 @@ export class FlightGraphService {
     this.vertices.get(vertex1).push(vertex2);
   }
 
-  findRoutes(originCity: string, destinationCity: string, departureTime: Date) {
+  findRoutes(options: FindRouteOptions) {
+    const { originCity, destinationCity, departureTime } = options;
     const routes: Route[] = [];
     const visited = new Set<string>();
 

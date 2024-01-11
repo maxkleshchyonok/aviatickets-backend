@@ -10,18 +10,14 @@ export class RoutesService {
   constructor(private flightGraph: FlightGraphService) {}
 
   findRoutes(query: GetRoutesQueryDto) {
-    const toDestinationRoutes = this.flightGraph.findRoutes(
-      query.originCity,
-      query.destinationCity,
-      query.departureDate,
-    );
+    const { originCity, destinationCity, arrivalTime } = query;
 
     let journeyType: JourneyTypes = JourneyTypes.One_way;
-
-    if (query.arrivalDate) {
+    if (arrivalTime) {
       journeyType = JourneyTypes.Round_trip;
     }
 
+    const toDestinationRoutes = this.flightGraph.findRoutes(query);
     const toDestinationRoutesDto = this.sortRoutesByPrice(
       RouteDto.fromRoutes(toDestinationRoutes),
     );
@@ -30,11 +26,11 @@ export class RoutesService {
     let toOriginRoutesDto = [];
 
     if (journeyType === JourneyTypes.Round_trip) {
-      toOriginRoutes = this.flightGraph.findRoutes(
-        query.destinationCity,
-        query.originCity,
-        query.arrivalDate,
-      );
+      toOriginRoutes = this.flightGraph.findRoutes({
+        originCity: destinationCity,
+        destinationCity: originCity,
+        departureTime: arrivalTime,
+      });
 
       toOriginRoutesDto = this.sortRoutesByPrice(
         RouteDto.fromRoutes(toOriginRoutes),
