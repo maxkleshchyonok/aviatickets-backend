@@ -8,6 +8,8 @@ export class FlightDto extends UUIDDto {
   arrivalTime: number;
   status: FlightStatuses;
   price: number;
+  seatAmount: number;
+  availableSeatAmount: number;
 
   static fromEntity(entity?: Flight) {
     if (!entity) {
@@ -24,7 +26,8 @@ export class FlightDto extends UUIDDto {
     it.departureTime = entity.departureTime.valueOf();
     it.status = entity.status;
     it.price = entity.price;
-
+    it.seatAmount = entity.seatAmount;
+    it.availableSeatAmount = entity.availableSeatAmount;
     return it;
   }
 

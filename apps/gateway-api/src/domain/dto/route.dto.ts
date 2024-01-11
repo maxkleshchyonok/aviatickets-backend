@@ -1,8 +1,9 @@
 import { Route } from 'api/types/route.type';
 import { FlightDto } from './flight.dto';
-import { UUIDDto } from './uuid.dto';
+import { v4 } from 'uuid';
 
-export class RouteDto extends UUIDDto {
+export class RouteDto {
+  id: string;
   travelTime: number;
   price: number;
   stops: number;
@@ -16,6 +17,7 @@ export class RouteDto extends UUIDDto {
     }
 
     const it = new RouteDto();
+    it.id = v4();
     it.flights = FlightDto.fromEntities(route);
     const firstFlight = it.flights.at(0);
     const lastFlight = it.flights.at(-1);

@@ -6,8 +6,15 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
+  Max,
+  Min,
   MinDate,
 } from 'class-validator';
+
+export enum PassengerAmount {
+  Min = 1,
+  Max = 10,
+}
 
 export class GetRoutesQueryDto {
   @IsEnum(Cities)
@@ -24,7 +31,7 @@ export class GetRoutesQueryDto {
   @MinDate(new Date())
   @Type(() => Date)
   @RemoveExtraSpaces()
-  departureDate: Date;
+  departureTime: Date;
 
   @IsOptional()
   @Transform(({ value }) => value && new Date(value))
@@ -32,5 +39,10 @@ export class GetRoutesQueryDto {
   @MinDate(new Date())
   @Type(() => Date)
   @RemoveExtraSpaces()
-  arrivalDate?: Date;
+  arrivalTime?: Date;
+
+  @Max(PassengerAmount.Max)
+  @Min(PassengerAmount.Min)
+  @Transform(({ value }) => Number(value))
+  passengerAmount: number;
 }
