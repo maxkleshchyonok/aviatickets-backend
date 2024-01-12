@@ -17,6 +17,9 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {}
+    "paths": {
+      "api/*" : ["apps/gateway-api/src/*"],
+      "chat/*" : ["apps/gateway-chat/src/*"]
+    }
   }
 }
