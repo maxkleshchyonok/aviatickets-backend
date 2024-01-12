@@ -154,8 +154,8 @@ model Flight {
   seatAmount          Int            @map("seat_amount")
   availableSeatAmount Int            @map("available_seat_amount")
 
-  plane   Plane     @relation(fields: [planeId], references: [id])
-  planeId String    @map("plane_id") @db.Uuid
+  plane   Plane?    @relation(fields: [planeId], references: [id])
+  planeId String?   @map("plane_id") @db.Uuid
   Booking Booking[]
 
   @@map("flights")
