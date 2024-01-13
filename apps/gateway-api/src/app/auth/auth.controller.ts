@@ -72,17 +72,17 @@ export class AuthController {
 
   @Post('forgot-password')
   async forgotPassword(@Body() body: ForgotForm) {
-    await this.authService.sendPasswordResetCode(body.email);
+    return await this.authService.sendPasswordResetCode(body);
   }
 
   @Post('verify')
   async verifyResetCode(@Body() body: VerifyForm) {
-    return await this.authService.verifyResetCode(body);
+    return await this.authService.verifyResetCode(body.email, { deviceId: body.deviceId }, body.code);
   }
 
   @Post('reset-password')
   async resetPassword(@Body() body: ResetForm) {
-    await this.authService.resetPassword(body);
+    return await this.authService.resetPassword(body.email, body.password, body.deviceId);
   }
 
 }

@@ -16,6 +16,18 @@ CREATE TABLE "roles" (
 );
 
 -- CreateTable
+CREATE TABLE "devices" (
+    "id" UUID NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "user_id" UUID NOT NULL,
+    "device_id" UUID NOT NULL,
+    "reset_token" UUID,
+
+    CONSTRAINT "devices_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "users" (
     "id" UUID NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -25,7 +37,6 @@ CREATE TABLE "users" (
     "email" TEXT NOT NULL,
     "role_type" "RoleTypes" NOT NULL DEFAULT 'user',
     "password" TEXT NOT NULL,
-    "refresh_token" TEXT,
     "roleId" UUID NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
@@ -102,10 +113,19 @@ CREATE TABLE "planes" (
 CREATE UNIQUE INDEX "roles_id_type_key" ON "roles"("id", "type");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "devices_user_id_device_id_key" ON "devices"("user_id", "device_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "devices_device_id_reset_token_key" ON "devices"("device_id", "reset_token");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "passengers_passport_key" ON "passengers"("passport");
+
+-- AddForeignKey
+ALTER TABLE "devices" ADD CONSTRAINT "devices_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -1,9 +1,13 @@
-import { IsEmail, IsNotEmpty, validate } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, IsUUID, validate } from "class-validator";
 
 export class ForgotForm {
     @IsNotEmpty()
     @IsEmail()
     public email: string
+
+    @IsNotEmpty()
+    @IsUUID()
+    public deviceId: string
 
     static from(form?: ForgotForm) {
         const it = new ForgotForm();

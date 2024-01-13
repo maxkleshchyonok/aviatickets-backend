@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString, Length, Matches, validate } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsString, IsUUID, Length, Matches, validate } from "class-validator";
 import { RemoveExtraSpaces } from 'api/decorators/remove-extra-spaces.decorator';
 import { STRONG_PASSWORD_REG_EXP } from "apps/gateway-api/src/app/auth/constants/auth.constants";
 
@@ -12,6 +12,9 @@ export class ResetForm {
     @IsEmail()
     public email: string
 
+    @IsNotEmpty()
+    @IsUUID()
+    public deviceId: string
 
     static from(form?: ResetForm) {
         const it = new ResetForm();

@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Role, User } from '@prisma/client';
+import { Device, Role, User } from '@prisma/client';
 import { SecurityConfig } from 'api/config/security.config';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { ErrorMessage } from 'api/enums/error-message.enum';
@@ -63,19 +63,20 @@ export class SecurityService {
       ...resetSignOptions,
     });
 
-    return { resetToken, randomResetCode };
+    return {resetToken, randomResetCode}; 
   }
 
-  decodeToken(token: Pick<User, 'refreshToken'>) {
+  decodeToken(token: Pick<Device, "resetToken">['resetToken']) {
     const securityConfig = this.config.get<SecurityConfig>('security');
     const { secret: resetSecret } = securityConfig.resetTokenOptions;
 
     try {
-      const decoded = this.jwtService.verify(token.refreshToken, {
+      const decodedToken = this.jwtService.verify(token, {
         secret: resetSecret,
       });
+      const isValid = true;
 
-      return decoded;
+      return {decodedToken, isValid};
     } catch (error) {
       throw new UnauthorizedException(ErrorMessage.BadResetToken);
     }

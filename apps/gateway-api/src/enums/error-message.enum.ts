@@ -27,4 +27,5 @@ export enum ErrorMessage {
   BadRefreshToken = 'errors.bad-refresh-token',
   BadResetToken = 'errors.bad-reset-token',
   BadVerification = 'errors.verification-failed',
+  NotAuthorizedDevice = 'errors.bad-device',
 }

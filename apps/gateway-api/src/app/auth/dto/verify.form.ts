@@ -1,19 +1,21 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsString, Length, Matches, validate } from "class-validator";
-import { VERIFY_CODE_REG_EXP } from "../constants/auth.constants";
+import { Device } from "@prisma/client";
+import { IsEmail, IsNotEmpty, IsNumber, IsString, IsUUID, validate } from "class-validator";
 
 export class VerifyForm {
 
     @IsNotEmpty()
-    @IsNumber()
-    public code: number
+    @IsUUID()
+    public deviceId: string;
 
     @IsEmail()
     public email: string
 
+    @IsNumber()
+    public code: number
 
     static from(form?: VerifyForm) {
         const it = new VerifyForm();
-        it.code = form?.code;
+        it.deviceId = form?.deviceId;
         it.email = form?.email;
         return it;
     }

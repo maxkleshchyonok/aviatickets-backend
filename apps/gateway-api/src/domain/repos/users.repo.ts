@@ -10,6 +10,9 @@ export class UsersRepo {
   async findOneByEmail(email: Pick<User, 'email'>['email']) {
     return await this.prisma.user.findUnique({
       where: { email },
+      include: {
+        devices: true
+      }
     });
   }
 
@@ -44,36 +47,8 @@ export class UsersRepo {
       where: { email: resetData.email },
       data: {
         password: resetData.password,
-        refreshToken: null,
       }
     });
   }
 
-  async setVerificationCode(id: UserIdentifier, code: string) {
-    return await this.prisma.user.update({
-      where: { id },
-      data: {
-        refreshToken: code
-      }
-    });
-  }
-
-  async setRefreshToken(
-    id: UserIdentifier,
-    refreshToken: Pick<User, 'refreshToken'>['refreshToken'],
-  ) {
-    return await this.prisma.user.update({
-      where: { id },
-      data: { refreshToken },
-    });
-  }
-
-  async deleteRefreshToken(userId: UserIdentifier) {
-    return await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        refreshToken: null,
-      },
-    });
-  }
 }

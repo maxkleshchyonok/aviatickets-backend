@@ -31,21 +31,36 @@ model Role {
   @@map("roles")
 }
 
+model Device {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  userId     String  @default(uuid()) @map("user_id") @db.Uuid
+  deviceId   String  @map("device_id") @db.Uuid
+  resetToken String? @map("reset_token")
+  user       User?   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, deviceId])
+  @@unique([deviceId, resetToken])
+  @@map("devices")
+}
+
 model User {
   id        String   @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  firstName    String    @map("first_name")
-  lastName     String    @map("last_name")
-  email        String    @unique
-  roleType     RoleTypes @default(User) @map("role_type")
-  password     String
-  refreshToken String?   @map("refresh_token")
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
+  email     String    @unique
+  roleType  RoleTypes @default(User) @map("role_type")
+  password  String
 
+  devices Device[]
   booking Booking[]
-  role     Role      @relation(fields: [roleId], references: [id])
-  roleId   String    @db.Uuid
+  role    Role      @relation(fields: [roleId], references: [id])
+  roleId  String    @db.Uuid
 
   @@map("users")
 }
