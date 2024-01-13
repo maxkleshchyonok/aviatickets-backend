@@ -1,10 +1,18 @@
 import { faker } from '@faker-js/faker';
-import { PrismaClient, Cities, FlightStatuses, Flight } from '@prisma/client';
+import {
+  PrismaClient,
+  Cities,
+  FlightStatuses,
+  Flight,
+  Role,
+  RoleTypes,
+  UserPermissions,
+} from '@prisma/client';
 import { randomInt } from 'crypto';
 
 const prisma = new PrismaClient();
 
-type MockFlight = Omit<Flight, 'id' | 'createdAt' | 'updatedAt' | 'planeId'>;
+type SeedFlight = Omit<Flight, 'id' | 'createdAt' | 'updatedAt' | 'planeId'>;
 
 function getRandomInt(leftBoundary: number, rightBoundary: number): number {
   const min = Math.ceil(leftBoundary);
@@ -14,7 +22,7 @@ function getRandomInt(leftBoundary: number, rightBoundary: number): number {
 
 async function createFlights(quantity: number) {
   const cities = Object.values(Cities);
-  const flights: MockFlight[] = [];
+  const flights: SeedFlight[] = [];
 
   for (let i = 0; i < quantity; i++) {
     const departureTime = faker.date.soon({
@@ -37,7 +45,7 @@ async function createFlights(quantity: number) {
     const seatAmount = getRandomInt(10, 350);
     const availableSeatAmount = getRandomInt(1, seatAmount);
 
-    const flight: MockFlight = {
+    const flight: SeedFlight = {
       originCity: cities[originCityIndex],
       destinationCity: cities[destinationCityIndex],
       departureTime,
@@ -51,11 +59,34 @@ async function createFlights(quantity: number) {
     flights.push(flight);
   }
 
-  await prisma.flight.createMany({ data: flights });
+  return prisma.flight.createMany({ data: flights });
+}
+
+type SeedRole = Pick<Role, 'permissions' | 'type'>;
+
+async function createRoles() {
+  const userRole: SeedRole = {
+    type: RoleTypes.User,
+    permissions: [UserPermissions.All],
+  };
+
+  const adminRole: SeedRole = {
+    type: RoleTypes.Admin,
+    permissions: [UserPermissions.All],
+  };
+
+  const salesRole: SeedRole = {
+    type: RoleTypes.Sales,
+    permissions: [UserPermissions.All],
+  };
+
+  const roles = [userRole, adminRole, salesRole];
+
+  return prisma.role.createMany({ data: roles });
 }
 
 async function main() {
-  await createFlights(400);
+  await Promise.all([createFlights(400), createRoles()]);
 }
 
 main()
