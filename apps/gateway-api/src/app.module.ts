@@ -3,7 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from 'api/app/auth/auth.module';
 import appConfig from 'api/config/app.config';
 import securityConfig from 'api/config/security.config';
-import { RoutesModule } from './app/routes/routes.module';
+import { RoutesModule } from 'api/app/routes/routes.module';
+import { UsersModule } from 'api/app/users/users.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { RoutesModule } from './app/routes/routes.module';
     }),
     AuthModule,
     RoutesModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
