@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepo } from 'api/domain/repos/users.repo';
+import { UserIdentifier } from 'api/types/model-identifiers.types';
 import { GetUsersQueryDto } from './domain/get-users-query.dto';
 
 @Injectable()
@@ -8,5 +9,9 @@ export class UsersService {
 
   async findAllUsers(query: GetUsersQueryDto) {
     return await this.usersRepo.findAllUsers(query);
+  }
+
+  async findUserById(id: UserIdentifier) {
+    return await this.usersRepo.findOneById(id);
   }
 }

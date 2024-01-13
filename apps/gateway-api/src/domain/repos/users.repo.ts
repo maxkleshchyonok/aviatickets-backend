@@ -24,6 +24,12 @@ export class UsersRepo {
     return { count, users };
   }
 
+  async findOneById(id: UserIdentifier) {
+    return await this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
   async findOneByEmail(email: Pick<User, 'email'>['email']) {
     return await this.prisma.user.findUnique({
       where: { email },
