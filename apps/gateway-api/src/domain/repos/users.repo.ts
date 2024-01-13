@@ -62,6 +62,16 @@ export class UsersRepo {
     });
   }
 
+  async updateOne(
+    id: UserIdentifier,
+    user: Pick<User, 'firstName' | 'lastName'>,
+  ) {
+    return await this.prisma.user.update({
+      data: { ...user },
+      where: { id },
+    });
+  }
+
   async setRefreshToken(
     id: UserIdentifier,
     refreshToken: Pick<User, 'refreshToken'>['refreshToken'],
