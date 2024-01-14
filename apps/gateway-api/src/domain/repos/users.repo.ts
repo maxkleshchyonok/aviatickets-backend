@@ -1,11 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
+import { GetUsersQueryDto } from 'api/app/users/domain/get-users-query.dto';
 import { PrismaService } from 'api/libs/prisma/prisma.service';
 import { UserIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()
 export class UsersRepo {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findAllUsers(query: GetUsersQueryDto) {
+    const { pageNumber, pageSize } = query;
+
+    const prismaQuery: Prisma.UserFindManyArgs = {
+      skip: (pageNumber - 1) * pageSize,
+      take: pageSize,
+    };
+
+    const [count, users] = await this.prisma.$transaction([
+      this.prisma.user.count({ where: prismaQuery.where }),
+      this.prisma.user.findMany(prismaQuery),
+    ]);
+
+    return { count, users };
+  }
+
+  async findOneById(id: UserIdentifier) {
+    return await this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
 
   async findOneByEmail(email: Pick<User, 'email'>['email']) {
     return await this.prisma.user.findUnique({
@@ -36,6 +59,16 @@ export class UsersRepo {
       include: {
         role: true,
       },
+    });
+  }
+
+  async updateOne(
+    id: UserIdentifier,
+    user: Pick<User, 'firstName' | 'lastName'>,
+  ) {
+    return await this.prisma.user.update({
+      data: { ...user },
+      where: { id },
     });
   }
 
