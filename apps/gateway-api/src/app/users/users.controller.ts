@@ -17,6 +17,7 @@ import { UsersDto } from 'api/domain/dto/users.dto';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { CurrentUser } from 'api/libs/security/decorators/current-user.decorator';
 import { JwtPermissionsGuard } from 'api/libs/security/guards/jwt-permissions.guard';
+import { GetAllUserBookingsQueryDto } from './domain/get-all-user-bookings.dto';
 import { GetUsersQueryDto } from './domain/get-users-query.dto';
 import { UpdateUserForm } from './domain/update-user.form';
 import { UsersService } from './users.service';
@@ -30,6 +31,25 @@ export class UsersController {
   async getAllUsers(@Query() query: GetUsersQueryDto) {
     const usersWithCount = await this.usersService.findAllUsers(query);
     return UsersDto.fromResponse(usersWithCount);
+  }
+
+  @Get('me/bookings')
+  @UseGuards(JwtPermissionsGuard)
+  async getAllUserBookings(
+    @CurrentUser() user: UserSessionDto,
+    @Query() query: GetAllUserBookingsQueryDto,
+  ) {
+    const userEntity = await this.usersService.findUserById(user.id);
+    if (!userEntity) {
+      throw new InternalServerErrorException(ErrorMessage.RecordNotExists);
+    }
+
+    const userBookingsWithCount = await this.usersService.findAllUserBookings(
+      user.id,
+      query,
+    );
+
+    return UserDto.fromEntity(userEntity, userBookingsWithCount);
   }
 
   @Get('me')
