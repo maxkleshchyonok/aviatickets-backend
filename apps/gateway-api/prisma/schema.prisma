@@ -22,12 +22,6 @@ enum FlightStatuses {
   Completed @map("completed")
 }
 
-enum BookingStatuses {
-  Payed     @map("payed")
-  Booked    @map("booked")
-  Cancelled @map("cancelled")
-}
-
 enum Cities {
   Tirana
   Algiers
@@ -108,9 +102,9 @@ model User {
   password     String
   refreshToken String?   @map("refresh_token")
 
-  bookings Booking[]
-  role     Role      @relation(fields: [roleId], references: [id])
-  roleId   String    @map("role_id") @db.Uuid
+  booking Booking[]
+  role    Role      @relation(fields: [roleId], references: [id])
+  roleId  String    @map("role_id") @db.Uuid
 
   @@map("users")
 }
@@ -120,31 +114,15 @@ model Booking {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  status BookingStatuses
-  price  Int
+  status String
 
-  userId       String        @map("user_id") @db.Uuid
-  user         User          @relation(fields: [userId], references: [id])
-  bookingItems BookingItem[]
+  flightId   String      @map("flight_id") @db.Uuid
+  flight     Flight      @relation(fields: [flightId], references: [id])
+  userId     String      @map("user_id") @db.Uuid
+  user       User        @relation(fields: [userId], references: [id])
+  passengers Passenger[]
 
   @@map("bookings")
-}
-
-model BookingItem {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  price Int
-
-  passengerId String    @map("passenger_id") @db.Uuid
-  passenger   Passenger @relation(fields: [passengerId], references: [id])
-  flightId    String    @map("flight_id") @db.Uuid
-  flight      Flight    @relation(fields: [flightId], references: [id])
-  bookingId   String    @map("booking_id") @db.Uuid
-  booking     Booking   @relation(fields: [bookingId], references: [id])
-
-  @@map("booking_items")
 }
 
 model Passenger {
@@ -156,7 +134,8 @@ model Passenger {
   lastName   String @map("last_name")
   passportId String @unique @map("passport_id")
 
-  bookingItems BookingItem[]
+  bookingId String  @map("booking_id") @db.Uuid
+  booking   Booking @relation(fields: [bookingId], references: [id])
 
   @@map("passengers")
 }
@@ -175,9 +154,9 @@ model Flight {
   seatAmount          Int            @map("seat_amount")
   availableSeatAmount Int            @map("available_seat_amount")
 
-  plane       Plane?        @relation(fields: [planeId], references: [id])
-  planeId     String?       @map("plane_id") @db.Uuid
-  BookingItem BookingItem[]
+  plane   Plane?    @relation(fields: [planeId], references: [id])
+  planeId String?   @map("plane_id") @db.Uuid
+  Booking Booking[]
 
   @@map("flights")
 }

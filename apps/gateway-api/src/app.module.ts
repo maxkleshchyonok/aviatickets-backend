@@ -5,7 +5,6 @@ import appConfig from 'api/config/app.config';
 import securityConfig from 'api/config/security.config';
 import { RoutesModule } from 'api/app/routes/routes.module';
 import { UsersModule } from 'api/app/users/users.module';
-import { BookingsModule } from './app/bookings/bookings.module';
 
 @Module({
   imports: [
@@ -17,7 +16,6 @@ import { BookingsModule } from './app/bookings/bookings.module';
     AuthModule,
     RoutesModule,
     UsersModule,
-    BookingsModule,
   ],
 })
 export class AppModule {}
