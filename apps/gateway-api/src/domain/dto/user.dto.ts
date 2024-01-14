@@ -1,27 +1,5 @@
-import { Booking, RoleTypes, User } from '@prisma/client';
-import { BookingDto } from './booking.dto';
+import { RoleTypes, User } from '@prisma/client';
 import { UUIDDto } from './uuid.dto';
-
-interface BookingsWithCount {
-  count: number;
-  bookings: Booking[];
-}
-
-class BookingDataDto {
-  count: number;
-  bookings: BookingDto[];
-
-  static from(bookingsWithCount?: BookingsWithCount) {
-    if (!bookingsWithCount) {
-      return;
-    }
-
-    const it = new BookingDataDto();
-    it.count = bookingsWithCount.count;
-    it.bookings = BookingDto.fromEntities(bookingsWithCount.bookings);
-    return it;
-  }
-}
 
 export class UserDto extends UUIDDto {
   firstName: string;
@@ -29,9 +7,8 @@ export class UserDto extends UUIDDto {
   email: string;
   roleId: string;
   roleType: RoleTypes;
-  bookingData?: BookingDataDto;
 
-  static fromEntity(entity?: User, bookingsWithCount?: BookingsWithCount) {
+  static fromEntity(entity?: User) {
     if (!entity) {
       return;
     }
@@ -45,7 +22,6 @@ export class UserDto extends UUIDDto {
     it.email = entity.email;
     it.roleId = entity.roleId;
     it.roleType = entity.roleType;
-    it.bookingData = BookingDataDto.from(bookingsWithCount);
     return it;
   }
 
