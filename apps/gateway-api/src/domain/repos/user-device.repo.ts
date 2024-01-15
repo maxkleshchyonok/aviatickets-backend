@@ -12,23 +12,23 @@ export class UserDeviceRepo {
         });
     }
 
-    async findOneByUserIdAndDeviceId(user: Pick<User, 'id'>, device: Pick<Device, 'deviceId'>) {
+    async findOneByUserIdAndDeviceId(user: Pick<User, 'id'>, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
         return await this.prisma.device.findUnique({
             where: {
                 userId_deviceId: {
-                    deviceId: device.deviceId,
+                    deviceId,
                     userId: user.id
                 }
             }
         });
     }
 
-    async createDevice(data: Pick<Device, "deviceId" | "resetToken" | "userId">) {
+    async createDevice(data: Pick<Device, "deviceId" | 'hashedResetCode' | "userId">) {
         console.log(data);
         return await this.prisma.device.create({
             data: {
                 deviceId: data.deviceId,
-                resetToken: data.resetToken,
+                hashedResetCode: data.hashedResetCode,
                 userId: data.userId,
             }
         });
@@ -45,11 +45,11 @@ export class UserDeviceRepo {
         });
     }
 
-    async updateResetToken(id: string, token: string) {
+    async updateResetCode(id: string, code: string) {
         return await this.prisma.device.update({
             where: { id },
             data: {
-                resetToken: token,
+                hashedResetCode: code,
             }
         });
     }

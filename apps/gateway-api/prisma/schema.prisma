@@ -36,13 +36,12 @@ model Device {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  userId     String  @default(uuid()) @map("user_id") @db.Uuid
-  deviceId   String  @map("device_id") @db.Uuid
-  resetToken String? @map("reset_token")
-  user       User?   @relation(fields: [userId], references: [id])
+  userId          String  @default(uuid()) @map("user_id") @db.Uuid
+  deviceId        String  @map("device_id") @db.Uuid
+  hashedResetCode String? @map("reset_token")
+  user            User?   @relation(fields: [userId], references: [id])
 
   @@unique([userId, deviceId])
-  @@unique([deviceId, resetToken])
   @@map("devices")
 }
 

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
@@ -72,17 +73,17 @@ export class AuthController {
 
   @Post('forgot-password')
   async forgotPassword(@Body() body: ForgotForm) {
-    return await this.authService.sendPasswordResetCode(body);
+    return await this.authService.forgotPassword(body);
   }
 
   @Post('verify')
-  async verifyResetCode(@Body() body: VerifyForm) {
-    return await this.authService.verifyResetCode(body.email, { deviceId: body.deviceId }, body.code);
+  async verifyResetCode(@Headers('authorization') token: string, @Body() body: VerifyForm) {
+    return await this.authService.verifyResetCode(body.code, token);
   }
 
   @Post('reset-password')
-  async resetPassword(@Body() body: ResetForm) {
-    return await this.authService.resetPassword(body.email, body.password, body.deviceId);
+  async resetPassword( @Headers('authorization') token: string, @Body() body: ResetForm) {
+    return await this.authService.resetPassword(body, token);
   }
 
 }

@@ -7,6 +7,15 @@ import { UserIdentifier } from 'api/types/model-identifiers.types';
 export class UsersRepo {
   constructor(private readonly prisma: PrismaService) { }
 
+  async findOneById(id: Pick<User, 'id'>['id']) {
+    return await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        devices: true
+      }
+    });
+  }
+
   async findOneByEmail(email: Pick<User, 'email'>['email']) {
     return await this.prisma.user.findUnique({
       where: { email },

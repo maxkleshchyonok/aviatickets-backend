@@ -54,16 +54,14 @@ export class AuthService {
   }
 
   async authenticate(user: User & { role: Role }, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
-    const tokens = this.securityService.generateTokens(user);
-
-    const { resetToken } = this.securityService.generateResetToken();
+    const tokens = this.securityService.generateTokens(user, deviceId);
 
     const data: Pick<User, 'email'> & Pick<Device, 'deviceId'> = {
       email: user.email,
       deviceId: deviceId,
     }
 
-    await this.createDevice(data, resetToken);
+    await this.createDevice(data, null);
 
     return tokens;
   }
@@ -72,18 +70,23 @@ export class AuthService {
     return await this.devicesRepo.deleteDevice(userId, deviceId);
   }
 
-  async sendPasswordResetCode(data: Pick<User, 'email'> & Pick<Device, 'deviceId'>) {
+  async forgotPassword(data: Pick<User, 'email'> & Pick<Device, 'deviceId'>) {
+    const user = await this.usersRepo.findOneByEmail(data.email);
 
-    const { resetToken, randomResetCode } = this.securityService.generateResetToken();
+    const resetToken = this.securityService.generateResetToken(user.id, data.deviceId);
 
-    await this.createDevice(data, resetToken);
+    const { hashedCode, randomResetCode } = this.securityService.generateRandomCode();
 
-    return await this.mailerService.sendEmail(data.email, randomResetCode);
+    await this.createDevice(data, hashedCode);
+
+    await this.mailerService.sendEmail(data.email, randomResetCode);
+
+    return resetToken;
   }
 
   async createDevice(
     data: Pick<User, 'email'> & Pick<Device, 'deviceId'>,
-    resetToken: Pick<Device, "resetToken">['resetToken']
+    resetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode']
   ) {
     const user = await this.usersRepo.findOneByEmail(data.email);
 
@@ -91,50 +94,50 @@ export class AuthService {
       throw new Error(ErrorMessage.UserNotExists);
     }
 
-    const deviceData: Pick<Device, "deviceId" | "resetToken" | "userId"> = {
+    const deviceData: Pick<Device, "deviceId" | 'hashedResetCode' | "userId"> = {
       deviceId: data.deviceId,
-      resetToken: resetToken,
+      hashedResetCode: resetCode,
       userId: user.id,
     }
 
     return await this.devicesRepo.createDevice(deviceData);
   }
 
-  async verifyResetCode(email: Pick<User, 'email'>['email'], deviceId: Pick<Device, 'deviceId'>, code: number) {
-    const user = await this.usersRepo.findOneByEmail(email);
-    const tokenData = await this.devicesRepo.findOneByUserIdAndDeviceId(user, deviceId);
+  async verifyResetCode(code: number, resetToken: string) {
 
-    const { decodedToken } = await this.securityService.decodeToken(tokenData.resetToken);
+    const { decodedToken } = this.securityService.decodeResetToken(resetToken);
 
-    if (decodedToken.code === code) {
+    const user = await this.usersRepo.findOneById(decodedToken.userId);
+
+    const device = await this.devicesRepo.findOneByUserIdAndDeviceId(user, decodedToken.deviceId);
+
+    const hashedResetCode = this.securityService.hashResetCode(code);
+
+    if (device.hashedResetCode === hashedResetCode) {
       return true;
     }
     return false;
   }
 
-  async resetPassword(
-    email: Pick<User, 'email'>['email'],
-    password: Pick<User, 'password'>['password'],
-    deviceId: Pick<Device, 'deviceId'>['deviceId']
-  ) {
-    const user = await this.usersRepo.findOneByEmail(email);
+  async resetPassword(password: Pick<User, 'password'>, resetToken: string) {
+    const { decodedToken, isValid } = this.securityService.decodeResetToken(resetToken);
 
-    const deviceData = user.devices.find(device => device.deviceId === deviceId);
+    const user = await this.usersRepo.findOneById(decodedToken.userId);
+
+    const deviceData = user.devices.find(device => device.deviceId === decodedToken.deviceId);
 
     if (!deviceData) {
       throw new Error(ErrorMessage.NotAuthorizedDevice);
     }
 
-    const { isValid } = await this.securityService.decodeToken(deviceData.resetToken);
-
     if (!isValid) {
       throw new Error(ErrorMessage.BadResetToken);
     }
 
-    const hashedPassword = await this.securityService.hashPassword(password);
+    const hashedPassword = await this.securityService.hashPassword(password.password);
 
     const resetData: Pick<User, 'email' | 'password'> = {
-      email: email,
+      email: user.email,
       password: hashedPassword,
     }
 

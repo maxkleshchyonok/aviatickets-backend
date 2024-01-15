@@ -23,8 +23,8 @@ export class SecurityService {
     return (await this.hashPassword(plainPassword)) === hashedPassword;
   }
 
-  generateTokens(model: User & { role: Role }) {
-    const payload = UserSessionDto.toPlainObject(model);
+  generateTokens(model: User & { role: Role }, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
+    const payload = UserSessionDto.toPlainObject(model, deviceId);
     const securityConfig = this.config.get<SecurityConfig>('security');
 
     const { secret: atSecret, signOptions: atSignOptions } =
@@ -45,17 +45,14 @@ export class SecurityService {
     return { accessToken, refreshToken };
   }
 
-  generateResetToken() {
+  generateResetToken(userId: Pick<User, 'id'>['id'], deviceId: Pick<Device, 'deviceId'>['deviceId']) {
     const securityConfig = this.config.get<SecurityConfig>('security');
     const { secret: resetSecret, signOptions: resetSignOptions } =
       securityConfig.resetTokenOptions;
 
-    const min = 100000;
-    const max = 999999;
-    const randomResetCode = Math.floor(Math.random() * (max - min + 1)) + min;
-
     const payload = {
-      code: randomResetCode,
+      deviceId,
+      userId,
     }
 
     const resetToken = this.jwtService.sign(payload, {
@@ -63,10 +60,10 @@ export class SecurityService {
       ...resetSignOptions,
     });
 
-    return {resetToken, randomResetCode}; 
+    return resetToken;
   }
 
-  decodeToken(token: Pick<Device, "resetToken">['resetToken']) {
+  decodeResetToken(token: string) {
     const securityConfig = this.config.get<SecurityConfig>('security');
     const { secret: resetSecret } = securityConfig.resetTokenOptions;
 
@@ -76,10 +73,26 @@ export class SecurityService {
       });
       const isValid = true;
 
-      return {decodedToken, isValid};
+      return { decodedToken, isValid };
     } catch (error) {
       throw new UnauthorizedException(ErrorMessage.BadResetToken);
     }
+  }
+
+  generateRandomCode() {
+    const min = 100000;
+    const max = 999999;
+    const randomResetCode = Math.floor(Math.random() * (max - min + 1)) + min;
+    const hashedCode = this.hashResetCode(randomResetCode);
+
+    return { hashedCode, randomResetCode };
+  }
+
+  hashResetCode(resetCode: number) {
+    const hash = crypto.createHash('sha256');
+    hash.update(resetCode.toString());
+    const hashedCode = hash.digest('hex');
+    return hashedCode;
   }
 
 }
