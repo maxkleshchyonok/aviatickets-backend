@@ -67,7 +67,7 @@ export class AuthController {
   @UseGuards(JwtPermissionsGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
-    await this.authService.signout(user.id);
+    await this.authService.signout(user.id, user.deviceId);
   }
 
   @Post('forgot-password')

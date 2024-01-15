@@ -1,9 +1,15 @@
 import { Role, RoleTypes, User, UserPermissions } from '@prisma/client';
-import { IsIn, IsUUID } from 'class-validator';
+import { RemoveExtraSpaces } from 'api/decorators/remove-extra-spaces.decorator';
+import { IsIn, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class UserSessionDto {
   @IsUUID()
   id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @RemoveExtraSpaces()
+  deviceId: string;
 
   @IsUUID()
   roleId: string;

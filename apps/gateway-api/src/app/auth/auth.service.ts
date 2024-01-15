@@ -68,8 +68,8 @@ export class AuthService {
     return tokens;
   }
 
-  async signout(userId: UserIdentifier) {
-    //return await this.usersRepo.deleteRefreshToken(userId);
+  async signout(userId: UserIdentifier, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
+    return await this.devicesRepo.deleteDevice(userId, deviceId);
   }
 
   async sendPasswordResetCode(data: Pick<User, 'email'> & Pick<Device, 'deviceId'>) {
