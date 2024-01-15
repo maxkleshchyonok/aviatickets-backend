@@ -6,11 +6,6 @@ export class UserSessionDto {
   @IsUUID()
   id: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @RemoveExtraSpaces()
-  deviceId: string;
-
   @IsUUID()
   roleId: string;
 
@@ -22,7 +17,6 @@ export class UserSessionDto {
   static from(session: UserSessionDto) {
     const it = new UserSessionDto();
     it.id = session.id;
-    it.deviceId = session.deviceId;
     it.roleId = session.roleId;
     it.roleType = session.roleType;
     it.permissions = session.permissions;

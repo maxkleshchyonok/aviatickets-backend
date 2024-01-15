@@ -52,6 +52,7 @@ export class UsersRepo {
   }
 
   async resetPassword(resetData: Pick<User, 'email' | 'password'>) {
+    console.log(resetData);
     return await this.prisma.user.update({
       where: { email: resetData.email },
       data: {

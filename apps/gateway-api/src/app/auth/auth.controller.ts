@@ -64,12 +64,12 @@ export class AuthController {
     });
   }
 
-  @Get('signout')
-  @UseGuards(JwtPermissionsGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async signout(@CurrentUser() user: UserSessionDto) {
-    await this.authService.signout(user.id, user.deviceId);
-  }
+  // @Get('signout')
+  // @UseGuards(JwtPermissionsGuard)
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // async signout(@Headers('authorization') token: string, @CurrentUser() user: UserSessionDto) {
+  //   await this.authService.signout(user.id, token);
+  // }
 
   @Post('forgot-password')
   async forgotPassword(@Body() body: ForgotForm) {

@@ -66,9 +66,9 @@ export class AuthService {
     return tokens;
   }
 
-  async signout(userId: UserIdentifier, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
-    return await this.devicesRepo.deleteDevice(userId, deviceId);
-  }
+  // async signout(userId: UserIdentifier, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
+  //   return await this.devicesRepo.deleteDevice(userId, deviceId);
+  // }
 
   async forgotPassword(data: Pick<User, 'email'> & Pick<Device, 'deviceId'>) {
     const user = await this.usersRepo.findOneByEmail(data.email);
@@ -80,6 +80,8 @@ export class AuthService {
     await this.createDevice(data, hashedCode);
 
     await this.mailerService.sendEmail(data.email, randomResetCode);
+
+    console.log(resetToken);
 
     return resetToken;
   }
@@ -104,8 +106,9 @@ export class AuthService {
   }
 
   async verifyResetCode(code: number, resetToken: string) {
+    console.log(code, resetToken);
 
-    const { decodedToken } = this.securityService.decodeResetToken(resetToken);
+    const { decodedToken } = this.securityService.decodeResetToken(resetToken.split(' ')[1]);
 
     const user = await this.usersRepo.findOneById(decodedToken.userId);
 
@@ -114,17 +117,23 @@ export class AuthService {
     const hashedResetCode = this.securityService.hashResetCode(code);
 
     if (device.hashedResetCode === hashedResetCode) {
-      return true;
+      const resetToken = this.securityService.generateResetToken(user.id, device.deviceId, hashedResetCode);
+      return resetToken;
     }
-    return false;
+    
+    return null;
   }
 
   async resetPassword(password: Pick<User, 'password'>, resetToken: string) {
-    const { decodedToken, isValid } = this.securityService.decodeResetToken(resetToken);
+    const { decodedToken, isValid } = this.securityService.decodeResetToken(resetToken.split(' ')[1]);
 
     const user = await this.usersRepo.findOneById(decodedToken.userId);
 
     const deviceData = user.devices.find(device => device.deviceId === decodedToken.deviceId);
+
+    if (decodedToken.hashedResetCode !== deviceData.hashedResetCode) {
+      throw new Error(ErrorMessage.BadVerification);
+    }
 
     if (!deviceData) {
       throw new Error(ErrorMessage.NotAuthorizedDevice);
@@ -140,6 +149,8 @@ export class AuthService {
       email: user.email,
       password: hashedPassword,
     }
+
+    await this.devicesRepo.deleteDevice(deviceData.id);
 
     return await this.usersRepo.resetPassword(resetData);
   }

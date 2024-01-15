@@ -45,7 +45,10 @@ export class SecurityService {
     return { accessToken, refreshToken };
   }
 
-  generateResetToken(userId: Pick<User, 'id'>['id'], deviceId: Pick<Device, 'deviceId'>['deviceId']) {
+  generateResetToken(userId: Pick<User, 'id'>['id'],
+   deviceId: Pick<Device, 'deviceId'>['deviceId'],
+   hashedResetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode'] = null
+    ) {
     const securityConfig = this.config.get<SecurityConfig>('security');
     const { secret: resetSecret, signOptions: resetSignOptions } =
       securityConfig.resetTokenOptions;
@@ -53,6 +56,7 @@ export class SecurityService {
     const payload = {
       deviceId,
       userId,
+      hashedResetCode
     }
 
     const resetToken = this.jwtService.sign(payload, {

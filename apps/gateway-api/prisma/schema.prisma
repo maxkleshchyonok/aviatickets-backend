@@ -38,7 +38,7 @@ model Device {
 
   userId          String  @default(uuid()) @map("user_id") @db.Uuid
   deviceId        String  @map("device_id") @db.Uuid
-  hashedResetCode String? @map("reset_token")
+  hashedResetCode String? 
   user            User?   @relation(fields: [userId], references: [id])
 
   @@unique([userId, deviceId])
