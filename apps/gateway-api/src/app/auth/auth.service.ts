@@ -32,7 +32,7 @@ export class AuthService {
   }
 
   async makeNewUser(
-    user: Pick<User, 'email' | 'password' | 'firstName' | 'lastName'>,
+    user: Pick<User, 'email' | 'password' | 'firstName' | 'lastName'>
   ) {
     const role = await this.rolesRepo.findOneByType(RoleTypes.User);
     if (!role) {
@@ -53,8 +53,18 @@ export class AuthService {
     });
   }
 
-  async authenticate(user: User & { role: Role }) {
+  async authenticate(user: User & { role: Role }, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
     const tokens = this.securityService.generateTokens(user);
+
+    const { resetToken } = this.securityService.generateResetToken();
+
+    const data: Pick<User, 'email'> & Pick<Device, 'deviceId'> = {
+      email: user.email,
+      deviceId: deviceId,
+    }
+
+    await this.createDevice(data, resetToken);
+
     return tokens;
   }
 
@@ -94,7 +104,7 @@ export class AuthService {
     const user = await this.usersRepo.findOneByEmail(email);
     const tokenData = await this.devicesRepo.findOneByUserIdAndDeviceId(user, deviceId);
 
-    const {decodedToken} = await this.securityService.decodeToken(tokenData.resetToken);
+    const { decodedToken } = await this.securityService.decodeToken(tokenData.resetToken);
 
     if (decodedToken.code === code) {
       return true;
@@ -115,20 +125,20 @@ export class AuthService {
       throw new Error(ErrorMessage.NotAuthorizedDevice);
     }
 
-    const {isValid} = await this.securityService.decodeToken(deviceData.resetToken);
+    const { isValid } = await this.securityService.decodeToken(deviceData.resetToken);
 
     if (!isValid) {
-      throw new  Error(ErrorMessage.BadResetToken);
+      throw new Error(ErrorMessage.BadResetToken);
     }
 
     const hashedPassword = await this.securityService.hashPassword(password);
 
-      const resetData: Pick<User, 'email' | 'password'> = {
-        email: email,
-        password: hashedPassword,
-      }
+    const resetData: Pick<User, 'email' | 'password'> = {
+      email: email,
+      password: hashedPassword,
+    }
 
-      return await this.usersRepo.resetPassword(resetData);
+    return await this.usersRepo.resetPassword(resetData);
   }
 
 }

@@ -36,7 +36,7 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserCreationFailed);
     }
 
-    const tokens = await this.authService.authenticate(newUserEntity);
+    const tokens = await this.authService.authenticate(newUserEntity, body.deviceId);
 
     return AuthDto.from({
       ...tokens,
@@ -55,7 +55,7 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserNotExists);
     }
 
-    const tokens = await this.authService.authenticate(userEntity);
+    const tokens = await this.authService.authenticate(userEntity, body.deviceId);
 
     return AuthDto.from({
       ...tokens,
