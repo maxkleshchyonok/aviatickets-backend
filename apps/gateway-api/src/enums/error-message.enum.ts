@@ -24,7 +24,6 @@ export enum  ErrorMessage {
   UserNotExists = "errors.not-exist-user",
   UserAlreadyExists = 'errors.user-already-exists',
   RecordNotExists = "errors.not-exist-record",
-  BadRefreshToken = 'errors.bad-refresh-token',
   BadResetToken = 'errors.bad-reset-token',
   BadVerification = 'errors.verification-failed',
   NotAuthorizedDevice = 'errors.bad-device',

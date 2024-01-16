@@ -7,10 +7,6 @@ export interface SecurityConfig {
     secret: string;
     signOptions: SignOptions;
   };
-  refreshTokenOptions: {
-    secret: string;
-    signOptions: SignOptions;
-  };
   resetTokenOptions: {
     secret: string;
     signOptions: SignOptions;
@@ -21,10 +17,8 @@ export default registerAs('security', () => {
   const envVarsSchema = Joi.object()
     .keys({
       ACCESS_TOKEN_SECRET: Joi.string().required(),
-      REFRESH_TOKEN_SECRET: Joi.string().required(),
       RESET_TOKEN_SECRET: Joi.string().required(),
       ACCESS_TOKEN_LIFETIME: Joi.string().default('1d').required(),
-      REFRESH_TOKEN_LIFETIME: Joi.string().default('30d').required(),
       RESET_TOKEN_LIFETIME: Joi.string().default('5m').required(),
     })
     .unknown();
@@ -42,12 +36,6 @@ export default registerAs('security', () => {
       secret: envVars.ACCESS_TOKEN_SECRET,
       signOptions: {
         expiresIn: envVars.ACCESS_TOKEN_LIFETIME,
-      },
-    },
-    refreshTokenOptions: {
-      secret: envVars.REFRESH_TOKEN_SECRET,
-      signOptions: {
-        expiresIn: envVars.REFRESH_TOKEN_LIFETIME,
       },
     },
     resetTokenOptions: {

@@ -37,11 +37,10 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserCreationFailed);
     }
 
-    const tokens = await this.authService.authenticate(newUserEntity, body.deviceId);
+    const accessToken = await this.authService.authenticate(newUserEntity, body.deviceId);
 
     return AuthDto.from({
-      ...tokens,
-      user: newUserEntity,
+      accessToken,
     });
   }
 
@@ -56,11 +55,10 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserNotExists);
     }
 
-    const tokens = await this.authService.authenticate(userEntity, body.deviceId);
+    const accessToken = await this.authService.authenticate(userEntity, body.deviceId);
 
     return AuthDto.from({
-      ...tokens,
-      user: userEntity,
+      accessToken,
     });
   }
 

@@ -55,7 +55,7 @@ export class AuthService {
   }
 
   async authenticate(user: User & { role: Role }, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
-    const tokens = this.securityService.generateTokens(user, deviceId);
+    const accessToken = this.securityService.generateAccessToken(user, deviceId);
 
     const data: Pick<User, 'email'> & Pick<Device, 'deviceId'> = {
       email: user.email,
@@ -64,7 +64,7 @@ export class AuthService {
 
     await this.createDevice(data, null);
 
-    return tokens;
+    return accessToken;
   }
 
   async signout(user: UserSessionDto) {
@@ -151,7 +151,7 @@ export class AuthService {
       password: hashedPassword,
     }
 
-    await this.devicesRepo.deleteDevice(deviceData.id);
+    await this.devicesRepo.deleteDevice(user.id, deviceData.deviceId);
 
     return await this.usersRepo.resetPassword(resetData);
   }

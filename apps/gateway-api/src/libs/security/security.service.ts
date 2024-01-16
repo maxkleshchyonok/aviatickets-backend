@@ -23,39 +23,20 @@ export class SecurityService {
     return (await this.hashPassword(plainPassword)) === hashedPassword;
   }
 
-  generateTokens(model: User & { role: Role }, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
+  generateAccessToken(model: User & { role: Role }, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
     const payload = UserSessionDto.toPlainObject(model, deviceId);
     const securityConfig = this.config.get<SecurityConfig>('security');
 
     const { secret: atSecret, signOptions: atSignOptions } =
       securityConfig.accessTokenOptions;
-    const { secret: rtSecret, signOptions: rtSignOptions } =
-      securityConfig.refreshTokenOptions;
+    
 
     const accessToken = this.jwtService.sign(payload, {
       secret: atSecret,
       ...atSignOptions,
     });
 
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: rtSecret,
-      ...rtSignOptions,
-    });
-
-    return { accessToken, refreshToken };
-  }
-
-  decodeAccessToken(token: string) {
-    const securityConfig = this.config.get<SecurityConfig>('security');
-    const { secret: atSecret } = securityConfig.accessTokenOptions;
-    try {
-      const decodedToken = this.jwtService.verify(token, {
-        secret: atSecret,
-      });
-      return decodedToken;
-    } catch (error) {
-      throw new UnauthorizedException(ErrorMessage.BadResetToken);
-    }
+    return accessToken;
   }
 
   generateResetToken(userId: Pick<User, 'id'>['id'],
