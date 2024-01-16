@@ -8,6 +8,7 @@ import { SecurityService } from 'api/libs/security/security.service';
 import { UserIdentifier } from 'api/types/model-identifiers.types';
 import { MailerService } from 'api/libs/mailer/mailer.service';
 import { UserDeviceRepo } from 'api/domain/repos/user-device.repo';
+import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 
 @Injectable()
 export class AuthService {
@@ -66,9 +67,9 @@ export class AuthService {
     return tokens;
   }
 
-  // async signout(userId: UserIdentifier, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
-  //   return await this.devicesRepo.deleteDevice(userId, deviceId);
-  // }
+  async signout(user: UserSessionDto) {
+    return await this.devicesRepo.deleteDevice(user.id, user.deviceId);
+  }
 
   async forgotPassword(data: Pick<User, 'email'> & Pick<Device, 'deviceId'>) {
     const user = await this.usersRepo.findOneByEmail(data.email);
@@ -120,7 +121,7 @@ export class AuthService {
       const resetToken = this.securityService.generateResetToken(user.id, device.deviceId, hashedResetCode);
       return resetToken;
     }
-    
+
     return null;
   }
 

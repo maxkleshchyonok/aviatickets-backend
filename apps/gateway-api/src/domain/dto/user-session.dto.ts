@@ -12,6 +12,9 @@ export class UserSessionDto {
   @IsIn(Object.values(RoleTypes))
   roleType: RoleTypes;
 
+  @IsUUID()
+  deviceId: string
+
   permissions: UserPermissions[];
 
   static from(session: UserSessionDto) {
@@ -20,6 +23,7 @@ export class UserSessionDto {
     it.roleId = session.roleId;
     it.roleType = session.roleType;
     it.permissions = session.permissions;
+    it.deviceId = session.deviceId;
     return it;
   }
 

@@ -1,4 +1,4 @@
-export enum ErrorMessage {
+export enum  ErrorMessage {
   InvalidForm = 'errors.invalid-form',
   FieldShouldBeString = 'errors.field-invalid.should-be-string',
   FieldShouldBeNumber = 'errors.field-invalid.should-be-number',

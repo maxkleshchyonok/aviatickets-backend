@@ -34,9 +34,14 @@ export class UserDeviceRepo {
         });
     }
 
-    async deleteDevice(id: Pick<Device, 'id'>['id']) {
+    async deleteDevice(userId: Pick<User, 'id'>['id'], deviceId: Pick<Device, 'deviceId'>['deviceId']) {
         return await this.prisma.device.delete({
-            where: { id }
+            where: { 
+                userId_deviceId: {
+                    deviceId,
+                    userId
+                }
+             }
         });
     }
 

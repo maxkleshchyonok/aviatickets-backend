@@ -45,10 +45,23 @@ export class SecurityService {
     return { accessToken, refreshToken };
   }
 
+  decodeAccessToken(token: string) {
+    const securityConfig = this.config.get<SecurityConfig>('security');
+    const { secret: atSecret } = securityConfig.accessTokenOptions;
+    try {
+      const decodedToken = this.jwtService.verify(token, {
+        secret: atSecret,
+      });
+      return decodedToken;
+    } catch (error) {
+      throw new UnauthorizedException(ErrorMessage.BadResetToken);
+    }
+  }
+
   generateResetToken(userId: Pick<User, 'id'>['id'],
-   deviceId: Pick<Device, 'deviceId'>['deviceId'],
-   hashedResetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode'] = null
-    ) {
+    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+    hashedResetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode'] = null
+  ) {
     const securityConfig = this.config.get<SecurityConfig>('security');
     const { secret: resetSecret, signOptions: resetSignOptions } =
       securityConfig.resetTokenOptions;
