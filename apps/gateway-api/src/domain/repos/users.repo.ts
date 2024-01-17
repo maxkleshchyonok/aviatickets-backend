@@ -52,11 +52,21 @@ export class UsersRepo {
   }
 
   async resetPassword(resetData: Pick<User, 'email' | 'password'>) {
-    console.log(resetData);
     return await this.prisma.user.update({
       where: { email: resetData.email },
       data: {
         password: resetData.password,
+      }
+    });
+  }
+
+  async changePassword(data: Pick<User, 'id' | 'password'>) {
+    return await this.prisma.user.update({
+      where: {
+        id: data.id
+      },
+      data: {
+        password: data.password
       }
     });
   }

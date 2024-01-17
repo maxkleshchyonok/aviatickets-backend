@@ -9,6 +9,11 @@ export class ResetForm {
     @RemoveExtraSpaces()
     password: string;
 
+    @Matches(STRONG_PASSWORD_REG_EXP)
+    @IsString()
+    @RemoveExtraSpaces()
+    confirmPassword: string;
+
     static from(form?: ResetForm) {
         const it = new ResetForm();
         it.password = form?.password;

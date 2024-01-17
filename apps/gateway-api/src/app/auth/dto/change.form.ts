@@ -5,11 +5,22 @@ export class ChangePasswordForm {
     @IsNotEmpty()
     @IsString()
     @RemoveExtraSpaces()
-    public password: string
+    public oldPassword: string
+
+    @IsNotEmpty()
+    @IsString()
+    @RemoveExtraSpaces()
+    public newPassword: string
+
+    @IsNotEmpty()
+    @IsString()
+    @RemoveExtraSpaces()
+    public confirmNewPassword: string
 
     static from(form?: ChangePasswordForm) {
         const it = new ChangePasswordForm();
-        it.password = form.password;
+        it.oldPassword = form.oldPassword;
+        it.newPassword = form.newPassword;
         return it;
     }
 

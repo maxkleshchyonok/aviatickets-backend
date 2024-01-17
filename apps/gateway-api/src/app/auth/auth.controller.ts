@@ -33,6 +33,10 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserAlreadyExists);
     }
 
+    if (body.password !== body.confirmPassword) {
+      throw new InternalServerErrorException(ErrorMessage.BadPassword);
+    }
+
     const newUserEntity = await this.authService.makeNewUser(body);
     if (!newUserEntity) {
       throw new InternalServerErrorException(ErrorMessage.UserCreationFailed);
@@ -67,13 +71,17 @@ export class AuthController {
   @UseGuards(JwtPermissionsGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
-    await this.authService.signout(user);
+
+    return await this.authService.signout(user);
   }
 
   @Post('change-password')
   @UseGuards(JwtPermissionsGuard)
   @HttpCode(HttpStatus.OK)
   async changePassword(@CurrentUser() user: UserSessionDto, @Body() body: ChangePasswordForm) {
+    if (body.newPassword !== body.confirmNewPassword) {
+      throw new InternalServerErrorException(ErrorMessage.BadPassword);
+    }
     await this.authService.changePassword(user, body);
   }
 
@@ -88,7 +96,10 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  async resetPassword( @Headers('authorization') token: string, @Body() body: ResetForm) {
+  async resetPassword(@Headers('authorization') token: string, @Body() body: ResetForm) {
+    if (body.password !== body.confirmPassword) {
+      throw new InternalServerErrorException(ErrorMessage.BadPassword);
+    }
     return await this.authService.resetPassword(body, token);
   }
 

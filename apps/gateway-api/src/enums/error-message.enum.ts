@@ -27,4 +27,5 @@ export enum  ErrorMessage {
   BadResetToken = 'errors.bad-reset-token',
   BadVerification = 'errors.verification-failed',
   NotAuthorizedDevice = 'errors.bad-device',
+  BadPassword = 'errors.passwords-dont-match'
 }

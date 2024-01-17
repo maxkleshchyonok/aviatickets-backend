@@ -156,8 +156,17 @@ export class AuthService {
     return await this.usersRepo.resetPassword(resetData);
   }
 
-  async changePassword() {
-    
+  async changePassword(userData: UserSessionDto,
+    changeData: { oldPassword: string, newPassword: string, confirmNewPassword: string }) {
+    const user = await this.usersRepo.findOneById(userData.id);
+    if (user.password === changeData.oldPassword) {
+      const newData: Pick<User, 'id' | 'password'> = {
+        id: user.id,
+        password: changeData.newPassword
+      }
+      return this.usersRepo.changePassword(newData);
+    }
+    return null;
   }
 
 }

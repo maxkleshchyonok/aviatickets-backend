@@ -13,6 +13,11 @@ export class SignUpForm {
   @RemoveExtraSpaces()
   password: string;
 
+  @Matches(STRONG_PASSWORD_REG_EXP)
+  @IsString()
+  @RemoveExtraSpaces()
+  confirmPassword: string;
+
   @IsString()
   @RemoveExtraSpaces()
   firstName: string;
