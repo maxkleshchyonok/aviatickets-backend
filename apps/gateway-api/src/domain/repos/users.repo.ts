@@ -27,12 +27,18 @@ export class UsersRepo {
   async findOneById(id: UserIdentifier) {
     return await this.prisma.user.findUnique({
       where: { id },
+      include: {
+        devices: true
+      },
     });
   }
 
   async findOneByEmail(email: Pick<User, 'email'>['email']) {
     return await this.prisma.user.findUnique({
       where: { email },
+      include: {
+        devices: true
+      }
     });
   }
 
@@ -72,22 +78,24 @@ export class UsersRepo {
     });
   }
 
-  async setRefreshToken(
-    id: UserIdentifier,
-    refreshToken: Pick<User, 'refreshToken'>['refreshToken'],
-  ) {
+  async resetPassword(resetData: Pick<User, 'email' | 'password'>) {
     return await this.prisma.user.update({
-      where: { id },
-      data: { refreshToken },
+      where: { email: resetData.email },
+      data: {
+        password: resetData.password,
+      }
     });
   }
 
-  async deleteRefreshToken(userId: UserIdentifier) {
+  async changePassword(data: Pick<User, 'id' | 'password'>) {
     return await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        refreshToken: null,
+      where: {
+        id: data.id
       },
+      data: {
+        password: data.password
+      }
     });
   }
+
 }

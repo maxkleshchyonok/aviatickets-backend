@@ -5,3 +5,5 @@ export const STRONG_PASSWORD_REG_EXP = new RegExp(
     ',}',
   'g',
 );
+
+export const VERIFY_CODE_REG_EXP = new RegExp("^\d{6}$", 'gm');
