@@ -11,7 +11,9 @@ describe('GatewayChatController', () => {
       providers: [GatewayChatService],
     }).compile();
 
-    gatewayChatController = app.get<GatewayChatController>(GatewayChatController);
+    gatewayChatController = app.get<GatewayChatController>(
+      GatewayChatController,
+    );
   });
 
   describe('root', () => {
