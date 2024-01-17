@@ -156,4 +156,8 @@ export class AuthService {
     return await this.usersRepo.resetPassword(resetData);
   }
 
+  async changePassword() {
+    
+  }
+
 }

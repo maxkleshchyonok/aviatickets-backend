@@ -20,6 +20,7 @@ import { SignUpForm } from 'api/app/auth/dto/signup.form';
 import { ForgotForm } from 'api/app/auth/dto/forgot.form';
 import { VerifyForm } from 'api/app/auth/dto/verify.form';
 import { ResetForm } from 'api/app/auth/dto/reset.form';
+import { ChangePasswordForm } from './dto/change.form';
 
 @Controller('auth')
 export class AuthController {
@@ -67,6 +68,13 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
     await this.authService.signout(user);
+  }
+
+  @Post('change-password')
+  @UseGuards(JwtPermissionsGuard)
+  @HttpCode(HttpStatus.OK)
+  async changePassword(@CurrentUser() user: UserSessionDto, @Body() body: ChangePasswordForm) {
+    await this.authService.changePassword(user, body);
   }
 
   @Post('forgot-password')
