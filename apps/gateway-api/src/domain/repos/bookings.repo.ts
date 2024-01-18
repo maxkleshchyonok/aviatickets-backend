@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Booking, Prisma } from '@prisma/client';
 import { GetAllBookingsQueryDto } from 'api/app/bookings/domain/get-all-bookings-query.dto';
 import { GetAllUserBookingsQueryDto } from 'api/app/users/domain/get-all-user-bookings.dto';
 import { PrismaService } from 'api/libs/prisma/prisma.service';
@@ -7,7 +7,7 @@ import { UserIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()
 export class BookingsRepo {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async findAllBookings(query: GetAllBookingsQueryDto) {
     const { pageNumber, pageSize } = query;
@@ -68,5 +68,25 @@ export class BookingsRepo {
     ]);
 
     return { count, bookings };
+  }
+
+  async findOneById(id: Pick<Booking, 'id'>['id']) {
+    return await this.prisma.booking.findUnique({
+      where: { id },
+      include: {
+        bookingItems: true,
+      },
+    });
+  }
+
+  async updateUserBooking(bookingData: Pick<Booking, 'id' | 'status'>) {
+    const { id, status } = bookingData;
+    return await this.prisma.booking.update({
+      where: { id },
+      data: { status },
+      include: {
+        bookingItems: true,
+      }
+    });
   }
 }
