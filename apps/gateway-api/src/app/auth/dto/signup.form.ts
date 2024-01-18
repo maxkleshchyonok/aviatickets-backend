@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Matches } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 import { RemoveExtraSpaces } from 'api/decorators/remove-extra-spaces.decorator';
 import { STRONG_PASSWORD_REG_EXP } from '../constants/auth.constants';
 
@@ -13,6 +13,11 @@ export class SignUpForm {
   @RemoveExtraSpaces()
   password: string;
 
+  @Matches(STRONG_PASSWORD_REG_EXP)
+  @IsString()
+  @RemoveExtraSpaces()
+  confirmPassword: string;
+
   @IsString()
   @RemoveExtraSpaces()
   firstName: string;
@@ -20,4 +25,9 @@ export class SignUpForm {
   @IsString()
   @RemoveExtraSpaces()
   lastName: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @RemoveExtraSpaces()
+  deviceId: string;
 }
