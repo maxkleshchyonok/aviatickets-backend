@@ -16,15 +16,9 @@ export class BookingsRepo {
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
       include: {
-        bookingItems: {
-          include: {
-            passenger: true,
-            flight: true,
-          },
-          orderBy: {
-            flightId: Prisma.SortOrder.asc,
-          },
-        },
+        toOriginRoute: true,
+        toDestinationRoute: true,
+        passengers: true,
         user: true,
       },
     };
@@ -47,15 +41,10 @@ export class BookingsRepo {
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
       include: {
-        bookingItems: {
-          include: {
-            passenger: true,
-            flight: true,
-          },
-          orderBy: {
-            flightId: Prisma.SortOrder.asc,
-          },
-        },
+        toOriginRoute: true,
+        toDestinationRoute: true,
+        passengers: true,
+        user: true,
       },
       where: {
         userId,
@@ -74,7 +63,10 @@ export class BookingsRepo {
     return await this.prisma.booking.findUnique({
       where: { id },
       include: {
-        bookingItems: true,
+        toOriginRoute: true,
+        toDestinationRoute: true,
+        passengers: true,
+        user: true,
       },
     });
   }
@@ -85,7 +77,10 @@ export class BookingsRepo {
       where: { id },
       data: { status },
       include: {
-        bookingItems: true,
+        toOriginRoute: true,
+        toDestinationRoute: true,
+        passengers: true,
+        user: true,
       }
     });
   }
