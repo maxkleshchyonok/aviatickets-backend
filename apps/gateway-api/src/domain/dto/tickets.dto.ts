@@ -9,7 +9,7 @@ class TicketDto {
   toDestinationRoute: RouteDto;
   toOriginRoute: RouteDto | null;
 
-  static toTwoWayRoute(
+  static toTicket(
     toDestinationRoute: RouteDto,
     toOriginRoute: RouteDto | null = null,
   ) {
@@ -37,10 +37,10 @@ class TicketDto {
       .map((toDestinationRoute) => {
         if (areThereOriginRoutes) {
           return toOriginRoutes.map((toOriginRoute) =>
-            this.toTwoWayRoute(toDestinationRoute, toOriginRoute),
+            this.toTicket(toDestinationRoute, toOriginRoute),
           );
         }
-        return this.toTwoWayRoute(toDestinationRoute) as TicketDto;
+        return this.toTicket(toDestinationRoute) as TicketDto;
       })
       .flat(1);
 
