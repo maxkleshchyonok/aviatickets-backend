@@ -3,7 +3,7 @@ import { PaginationQueryDto } from './pagination-query.dto';
 import { RouteDto } from './route.dto';
 import { v4 } from 'uuid';
 
-class TwoWayRouteDto {
+class TicketDto {
   id: string;
   price: number;
   toDestinationRoute: RouteDto;
@@ -13,7 +13,7 @@ class TwoWayRouteDto {
     toDestinationRoute: RouteDto,
     toOriginRoute: RouteDto | null = null,
   ) {
-    const it = new TwoWayRouteDto();
+    const it = new TicketDto();
     it.id = v4();
     it.toDestinationRoute = toDestinationRoute;
     it.toOriginRoute = toOriginRoute;
@@ -33,24 +33,24 @@ class TwoWayRouteDto {
       return [];
     }
 
-    const routes = toDestinationRoutes
+    const tickets = toDestinationRoutes
       .map((toDestinationRoute) => {
         if (areThereOriginRoutes) {
           return toOriginRoutes.map((toOriginRoute) =>
             this.toTwoWayRoute(toDestinationRoute, toOriginRoute),
           );
         }
-        return this.toTwoWayRoute(toDestinationRoute) as TwoWayRouteDto;
+        return this.toTwoWayRoute(toDestinationRoute) as TicketDto;
       })
       .flat(1);
 
-    return routes;
+    return tickets;
   }
 }
 
-export class RoutesDto {
+export class TicketsDto {
   count: number;
-  routes: TwoWayRouteDto[];
+  tickets: TicketDto[];
 
   static fromRoutes(
     toDestinationRoutes: RouteDto[],
@@ -68,27 +68,24 @@ export class RoutesDto {
       (journeyType === JourneyTypes.Round_trip && oneOfRouteArraysIsEmpty) ||
       (journeyType === JourneyTypes.One_way && !toDestinationRouteAmount)
     ) {
-      const it = new RoutesDto();
+      const it = new TicketsDto();
       it.count = 0;
-      it.routes = [];
+      it.tickets = [];
       return it;
     }
 
     if (journeyType === JourneyTypes.One_way) {
-      const it = new RoutesDto();
+      const it = new TicketsDto();
       it.count = toDestinationRouteAmount;
-      const routes = TwoWayRouteDto.fromRoutes(toDestinationRoutes);
-      it.routes = paginateArray(routes, paginationOptions);
+      const tickets = TicketDto.fromRoutes(toDestinationRoutes);
+      it.tickets = paginateArray(tickets, paginationOptions);
       return it;
     }
 
-    const it = new RoutesDto();
+    const it = new TicketsDto();
     it.count = toDestinationRouteAmount * toOriginRouteAmount;
-    const routes = TwoWayRouteDto.fromRoutes(
-      toDestinationRoutes,
-      toOriginRoutes,
-    );
-    it.routes = paginateArray(routes, paginationOptions);
+    const tickets = TicketDto.fromRoutes(toDestinationRoutes, toOriginRoutes);
+    it.tickets = paginateArray(tickets, paginationOptions);
 
     return it;
   }
