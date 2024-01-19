@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { FlightGraphModule } from 'api/libs/flight-graph/flight-graph.module';
 import { PrismaModule } from 'api/libs/prisma/prisma.module';
-import { RoutesController } from './routes.controller';
-import { RoutesService } from './routes.service';
+import { TicketsController } from './tickets.controller';
+import { TicketsService } from './tickets.service';
 
 @Module({
   imports: [PrismaModule, FlightGraphModule],
-  controllers: [RoutesController],
-  providers: [RoutesService],
+  controllers: [TicketsController],
+  providers: [TicketsService],
 })
-export class RoutesModule {}
+export class TicketsModule {}

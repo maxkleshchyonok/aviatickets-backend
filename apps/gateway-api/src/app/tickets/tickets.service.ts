@@ -4,13 +4,13 @@ import { RoutesDto } from 'api/domain/dto/routes.dto';
 import { JourneyTypes } from 'api/enums/journey-types.enum';
 import { FlightGraphService } from 'api/libs/flight-graph/flight-graph.service';
 import { Route } from 'api/types/route.type';
-import { GetRoutesQueryDto } from './domain/get-routes-query.dto';
+import { GetTicketsQueryDto } from './domain/get-tickets-query.dto';
 
 @Injectable()
-export class RoutesService {
+export class TicketsService {
   constructor(private flightGraph: FlightGraphService) {}
 
-  async findRoutes(query: GetRoutesQueryDto) {
+  async findRoutes(query: GetTicketsQueryDto) {
     const {
       originCity,
       destinationCity,
