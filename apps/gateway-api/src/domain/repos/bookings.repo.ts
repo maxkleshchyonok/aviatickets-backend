@@ -7,7 +7,7 @@ import { UserIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()
 export class BookingsRepo {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAllBookings(query: GetAllBookingsQueryDto) {
     const { pageNumber, pageSize } = query;
@@ -27,7 +27,7 @@ export class BookingsRepo {
       this.prisma.booking.count({ where: prismaQuery.where }),
       this.prisma.booking.findMany(prismaQuery),
     ]);
-
+    
     return { count, bookings };
   }
 
@@ -55,7 +55,6 @@ export class BookingsRepo {
       this.prisma.booking.count({ where: prismaQuery.where }),
       this.prisma.booking.findMany(prismaQuery),
     ]);
-
     return { count, bookings };
   }
 
@@ -80,8 +79,8 @@ export class BookingsRepo {
         toOriginRoute: true,
         toDestinationRoute: true,
         passengers: true,
-        user: true,
-      }
+        user: true 
+      },
     });
   }
 }
