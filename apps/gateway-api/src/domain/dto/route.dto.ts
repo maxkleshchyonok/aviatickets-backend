@@ -1,9 +1,10 @@
+import { Cities } from '@prisma/client';
 import { Route } from 'api/types/route.type';
 import { FlightDto } from './flight.dto';
-import { v4 } from 'uuid';
 
 export class RouteDto {
-  id: string;
+  originCity: Cities;
+  destinationCity: Cities;
   travelTime: number;
   price: number;
   stops: number;
@@ -17,13 +18,14 @@ export class RouteDto {
     }
 
     const it = new RouteDto();
-    it.id = v4();
     it.flights = FlightDto.fromEntities(route);
     const firstFlight = it.flights.at(0);
     const lastFlight = it.flights.at(-1);
     it.departureTime = firstFlight.departureTime;
     it.arrivalTime = lastFlight.arrivalTime;
     it.travelTime = it.arrivalTime - it.departureTime;
+    it.originCity = firstFlight.originCity;
+    it.destinationCity = lastFlight.destinationCity;
     it.price = route.reduce((prev, flight) => prev + flight.price, 0);
     it.stops = it.flights.length - 1;
     return it;

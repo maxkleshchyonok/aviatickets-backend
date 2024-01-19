@@ -1,12 +1,11 @@
-import { Cities } from '@prisma/client';
 import { JourneyTypes } from 'api/enums/journey-types.enum';
 import { PaginationQueryDto } from './pagination-query.dto';
 import { RouteDto } from './route.dto';
+import { v4 } from 'uuid';
 
 class TwoWayRouteDto {
+  id: string;
   price: number;
-  originCity: Cities;
-  destinationCity: Cities;
   toDestinationRoute: RouteDto;
   toOriginRoute: RouteDto | null;
 
@@ -15,10 +14,7 @@ class TwoWayRouteDto {
     toOriginRoute: RouteDto | null = null,
   ) {
     const it = new TwoWayRouteDto();
-    const firstFlight = toDestinationRoute.flights.at(0);
-    const lastFlight = toDestinationRoute.flights.at(-1);
-    it.originCity = firstFlight.originCity;
-    it.destinationCity = lastFlight.destinationCity;
+    it.id = v4();
     it.toDestinationRoute = toDestinationRoute;
     it.toOriginRoute = toOriginRoute;
     it.price =
@@ -81,7 +77,8 @@ export class RoutesDto {
     if (journeyType === JourneyTypes.One_way) {
       const it = new RoutesDto();
       it.count = toDestinationRouteAmount;
-      it.routes = TwoWayRouteDto.fromRoutes(toDestinationRoutes);
+      const routes = TwoWayRouteDto.fromRoutes(toDestinationRoutes);
+      it.routes = paginateArray(routes, paginationOptions);
       return it;
     }
 
@@ -99,6 +96,9 @@ export class RoutesDto {
 
 const paginateArray = (array: any[], paginationOptions: PaginationQueryDto) => {
   const { pageNumber, pageSize } = paginationOptions;
-  const page = array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
-  return page;
+  const arrayChunk = array.slice(
+    (pageNumber - 1) * pageSize,
+    pageNumber * pageSize,
+  );
+  return arrayChunk;
 };
