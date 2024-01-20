@@ -6,6 +6,7 @@ import securityConfig from 'api/config/security.config';
 import { TicketsModule } from 'api/app/tickets/tickets.module';
 import { UsersModule } from 'api/app/users/users.module';
 import { BookingsModule } from './app/bookings/bookings.module';
+import { CitiesModule } from './app/cities/cities.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { BookingsModule } from './app/bookings/bookings.module';
     TicketsModule,
     UsersModule,
     BookingsModule,
+    CitiesModule,
   ],
 })
 export class AppModule {}
