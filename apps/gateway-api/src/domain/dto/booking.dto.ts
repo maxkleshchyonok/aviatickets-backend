@@ -1,4 +1,4 @@
-import { Booking, BookingStatuses, Cities, User, Flight} from '@prisma/client';
+import { Booking, BookingStatuses, Cities, User, Flight } from '@prisma/client';
 import { UserDto } from './user.dto';
 import { UUIDDto } from './uuid.dto';
 import { FlightDto } from './flight.dto';
@@ -13,10 +13,9 @@ export class BookingDto extends UUIDDto {
   toOriginRoute: FlightDto[];
 
   static fromEntity(
-    entity?: Booking 
-    & { user?: User } 
-    & { toDestinationRoute?: Flight[] } 
-    & {toOriginRoute? : Flight[]},
+    entity?: Booking & { user?: User } & { toDestinationRoute?: Flight[] } & {
+      toOriginRoute?: Flight[];
+    },
   ) {
     if (!entity) {
       return;
@@ -28,11 +27,11 @@ export class BookingDto extends UUIDDto {
     it.updatedAt = entity.updatedAt.valueOf();
     it.status = entity.status;
     it.price = entity.price;
-    it.destination = entity.destination
-    it.origin = entity.origin
+    it.destination = entity.destination;
+    it.origin = entity.origin;
     it.user = UserDto.fromEntity(entity.user);
     it.toDestinationRoute = FlightDto.fromEntities(entity.toDestinationRoute);
-    it.toOriginRoute = FlightDto.fromEntities(entity.toOriginRoute)
+    it.toOriginRoute = FlightDto.fromEntities(entity.toOriginRoute);
     return it;
   }
 

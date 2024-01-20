@@ -12,7 +12,7 @@ export class SecurityService {
   constructor(
     private readonly config: ConfigService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async hashPassword(password: string) {
     const hash = crypto.createHash('MD5');
@@ -23,13 +23,15 @@ export class SecurityService {
     return (await this.hashPassword(plainPassword)) === hashedPassword;
   }
 
-  generateAccessToken(model: User & { role: Role }, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
+  generateAccessToken(
+    model: User & { role: Role },
+    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+  ) {
     const payload = UserSessionDto.toPlainObject(model, deviceId);
     const securityConfig = this.config.get<SecurityConfig>('security');
 
     const { secret: atSecret, signOptions: atSignOptions } =
       securityConfig.accessTokenOptions;
-    
 
     const accessToken = this.jwtService.sign(payload, {
       secret: atSecret,
@@ -39,9 +41,10 @@ export class SecurityService {
     return accessToken;
   }
 
-  generateResetToken(userId: Pick<User, 'id'>['id'],
+  generateResetToken(
+    userId: Pick<User, 'id'>['id'],
     deviceId: Pick<Device, 'deviceId'>['deviceId'],
-    hashedResetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode'] = null
+    hashedResetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode'] = null,
   ) {
     const securityConfig = this.config.get<SecurityConfig>('security');
     const { secret: resetSecret, signOptions: resetSignOptions } =
@@ -50,8 +53,8 @@ export class SecurityService {
     const payload = {
       deviceId,
       userId,
-      hashedResetCode
-    }
+      hashedResetCode,
+    };
 
     const resetToken = this.jwtService.sign(payload, {
       secret: resetSecret,
@@ -92,5 +95,4 @@ export class SecurityService {
     const hashedCode = hash.digest('hex');
     return hashedCode;
   }
-
 }

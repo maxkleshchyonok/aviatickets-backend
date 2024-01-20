@@ -24,7 +24,7 @@ import { ChangePasswordForm } from './dto/change.form';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
   async signup(@Body() body: SignUpForm) {
@@ -42,7 +42,10 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserCreationFailed);
     }
 
-    const accessToken = await this.authService.authenticate(newUserEntity, body.deviceId);
+    const accessToken = await this.authService.authenticate(
+      newUserEntity,
+      body.deviceId,
+    );
 
     return AuthDto.from({
       accessToken,
@@ -60,7 +63,10 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserNotExists);
     }
 
-    const accessToken = await this.authService.authenticate(userEntity, body.deviceId);
+    const accessToken = await this.authService.authenticate(
+      userEntity,
+      body.deviceId,
+    );
 
     return AuthDto.from({
       accessToken,
@@ -71,14 +77,16 @@ export class AuthController {
   @UseGuards(JwtPermissionsGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
-
     return await this.authService.signout(user);
   }
 
   @Post('change-password')
   @UseGuards(JwtPermissionsGuard)
   @HttpCode(HttpStatus.OK)
-  async changePassword(@CurrentUser() user: UserSessionDto, @Body() body: ChangePasswordForm) {
+  async changePassword(
+    @CurrentUser() user: UserSessionDto,
+    @Body() body: ChangePasswordForm,
+  ) {
     if (body.newPassword !== body.confirmNewPassword) {
       throw new InternalServerErrorException(ErrorMessage.BadPassword);
     }
@@ -91,16 +99,21 @@ export class AuthController {
   }
 
   @Post('verify')
-  async verifyResetCode(@Headers('authorization') token: string, @Body() body: VerifyForm) {
+  async verifyResetCode(
+    @Headers('authorization') token: string,
+    @Body() body: VerifyForm,
+  ) {
     return await this.authService.verifyResetCode(body.code, token);
   }
 
   @Post('reset-password')
-  async resetPassword(@Headers('authorization') token: string, @Body() body: ResetForm) {
+  async resetPassword(
+    @Headers('authorization') token: string,
+    @Body() body: ResetForm,
+  ) {
     if (body.password !== body.confirmPassword) {
       throw new InternalServerErrorException(ErrorMessage.BadPassword);
     }
     return await this.authService.resetPassword(body, token);
   }
-
 }

@@ -14,7 +14,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/aviatickets-backend/main",
-    "generate": "npx prisma generate",
+    "generate": "npx prisma generate --schema=./apps/gateway-api/prisma/schema.prisma",
     "migrate": "npx prisma migrate dev --schema=./apps/gateway-api/prisma/schema.prisma",
     "migrate:create": "npx prisma migrate dev --create-only",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

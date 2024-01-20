@@ -10,7 +10,7 @@ export interface SecurityConfig {
   resetTokenOptions: {
     secret: string;
     signOptions: SignOptions;
-  }
+  };
 }
 
 export default registerAs('security', () => {
@@ -42,7 +42,7 @@ export default registerAs('security', () => {
       secret: envVars.RESET_TOKEN_SECRET,
       signOptions: {
         expiresIn: envVars.RESET_TOKEN_LIFETIME,
-      }
-    }
+      },
+    },
   } as SecurityConfig;
 });
