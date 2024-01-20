@@ -1,23 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { RouteDto } from 'api/domain/dto/route.dto';
-import { RoutesDto } from 'api/domain/dto/routes.dto';
 import { JourneyTypes } from 'api/enums/journey-types.enum';
 import { FlightGraphService } from 'api/libs/flight-graph/flight-graph.service';
 import { Route } from 'api/types/route.type';
-import { GetRoutesQueryDto } from './domain/get-routes-query.dto';
+import { GetTicketsQueryDto } from './domain/get-tickets-query.dto';
 
 @Injectable()
-export class RoutesService {
+export class TicketsService {
   constructor(private flightGraph: FlightGraphService) {}
 
-  async findRoutes(query: GetRoutesQueryDto) {
-    const {
-      originCity,
-      destinationCity,
-      arrivalTime,
-      passengerAmount,
-      ...paginationOptions
-    } = query;
+  async findRoutes(query: GetTicketsQueryDto) {
+    const { originCity, destinationCity, arrivalTime, passengerAmount } = query;
 
     let journeyType: JourneyTypes = JourneyTypes.One_way;
     if (arrivalTime) {
@@ -49,12 +42,7 @@ export class RoutesService {
       RouteDto.fromRoutes(toOriginRoutes),
     );
 
-    return RoutesDto.fromRoutes(
-      toDestinationRoutesDto,
-      toOriginRoutesDto,
-      journeyType,
-      paginationOptions,
-    );
+    return { toDestinationRoutesDto, toOriginRoutesDto, journeyType };
   }
 
   private sortRoutesByPrice(routes: RouteDto[]) {

@@ -6,6 +6,7 @@ export class FlightDto extends UUIDDto {
   destinationCity: Cities;
   departureTime: number;
   arrivalTime: number;
+  flightTime: number;
   status: FlightStatuses;
   price: number;
   seatAmount: number;
@@ -24,6 +25,7 @@ export class FlightDto extends UUIDDto {
     it.destinationCity = entity.destinationCity;
     it.arrivalTime = entity.arrivalTime.valueOf();
     it.departureTime = entity.departureTime.valueOf();
+    it.flightTime = it.arrivalTime - it.departureTime;
     it.status = entity.status;
     it.price = entity.price;
     it.seatAmount = entity.seatAmount;
