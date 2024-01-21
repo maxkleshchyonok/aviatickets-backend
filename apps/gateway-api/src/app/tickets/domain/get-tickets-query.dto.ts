@@ -9,7 +9,6 @@ import {
   IsOptional,
   Max,
   Min,
-  MinDate,
 } from 'class-validator';
 
 export enum PassengerAmount {
@@ -29,7 +28,6 @@ export class GetTicketsQueryDto extends PaginationQueryDto {
   @IsNotEmpty()
   @Transform(({ value }) => new Date(value))
   @IsDate()
-  @MinDate(new Date())
   @Type(() => Date)
   @RemoveExtraSpaces()
   departureTime: Date;
@@ -37,7 +35,6 @@ export class GetTicketsQueryDto extends PaginationQueryDto {
   @IsOptional()
   @Transform(({ value }) => value && new Date(value))
   @IsDate()
-  @MinDate(new Date())
   @Type(() => Date)
   @RemoveExtraSpaces()
   arrivalTime?: Date;
