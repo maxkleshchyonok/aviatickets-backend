@@ -16,7 +16,7 @@ export class UsersRepo {
       take: pageSize,
     };
 
-    const [count, users] = await this.prisma.$transaction([
+    const [count, users] = await Promise.all([
       this.prisma.user.count({ where: prismaQuery.where }),
       this.prisma.user.findMany(prismaQuery),
     ]);

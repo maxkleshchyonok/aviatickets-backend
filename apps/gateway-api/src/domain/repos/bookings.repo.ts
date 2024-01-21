@@ -24,7 +24,7 @@ export class BookingsRepo {
       },
     };
 
-    const [count, bookings] = await this.prisma.$transaction([
+    const [count, bookings] = await Promise.all([
       this.prisma.booking.count({ where: prismaQuery.where }),
       this.prisma.booking.findMany(prismaQuery),
     ]);
@@ -52,10 +52,11 @@ export class BookingsRepo {
       },
     };
 
-    const [count, bookings] = await this.prisma.$transaction([
+    const [count, bookings] = await Promise.all([
       this.prisma.booking.count({ where: prismaQuery.where }),
       this.prisma.booking.findMany(prismaQuery),
     ]);
+
     return { count, bookings };
   }
 
