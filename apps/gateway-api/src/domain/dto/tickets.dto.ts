@@ -20,8 +20,8 @@ export class TicketsDto {
       !toDestinationRouteAmount || !toOriginRouteAmount;
 
     if (
-      (journeyType === JourneyTypes.Round_trip && oneOfRouteArraysIsEmpty) ||
-      (journeyType === JourneyTypes.One_way && !toDestinationRouteAmount)
+      (journeyType === JourneyTypes.RoundTrip && oneOfRouteArraysIsEmpty) ||
+      (journeyType === JourneyTypes.OneWay && !toDestinationRouteAmount)
     ) {
       const it = new TicketsDto();
       it.count = 0;
@@ -29,7 +29,7 @@ export class TicketsDto {
       return it;
     }
 
-    if (journeyType === JourneyTypes.One_way) {
+    if (journeyType === JourneyTypes.OneWay) {
       const it = new TicketsDto();
       it.count = toDestinationRouteAmount;
       const tickets = TicketDto.fromRoutes(toDestinationRoutes);

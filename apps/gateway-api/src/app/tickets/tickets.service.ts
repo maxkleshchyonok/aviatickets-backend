@@ -12,15 +12,15 @@ export class TicketsService {
   async findRoutes(query: GetTicketsQueryDto) {
     const { originCity, destinationCity, arrivalTime, passengerAmount } = query;
 
-    let journeyType: JourneyTypes = JourneyTypes.One_way;
+    let journeyType: JourneyTypes = JourneyTypes.OneWay;
     if (arrivalTime) {
-      journeyType = JourneyTypes.Round_trip;
+      journeyType = JourneyTypes.RoundTrip;
     }
 
     const toDestinationRoutesPromise = this.flightGraph.findRoutes(query);
     let toOriginRoutesPromise = [] as unknown as Promise<Route[]>;
 
-    if (journeyType === JourneyTypes.Round_trip) {
+    if (journeyType === JourneyTypes.RoundTrip) {
       toOriginRoutesPromise = this.flightGraph.findRoutes({
         originCity: destinationCity,
         destinationCity: originCity,
