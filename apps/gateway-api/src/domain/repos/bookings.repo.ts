@@ -24,7 +24,7 @@ export class BookingsRepo {
       },
     };
 
-    const [count, bookings] = await this.prisma.$transaction([
+    const [count, bookings] = await Promise.all([
       this.prisma.booking.count({ where: prismaQuery.where }),
       this.prisma.booking.findMany(prismaQuery),
     ]);
@@ -52,10 +52,11 @@ export class BookingsRepo {
       },
     };
 
-    const [count, bookings] = await this.prisma.$transaction([
+    const [count, bookings] = await Promise.all([
       this.prisma.booking.count({ where: prismaQuery.where }),
       this.prisma.booking.findMany(prismaQuery),
     ]);
+
     return { count, bookings };
   }
 
@@ -90,26 +91,28 @@ export class BookingsRepo {
       data: {
         ...booking,
         toDestinationRoute: {
-          connect: booking.toDestinationRoute.map((id) => ({id: id}))
+          connect: booking.toDestinationRoute.map((id) => ({ id: id })),
         },
         toOriginRoute: {
-          connect: booking.toOriginRoute.map((id) => ({id: id}))
+          connect: booking.toOriginRoute.map((id) => ({ id: id })),
         },
         passengers: {
-          connect: booking.passengers.map((passenger) =>({passportId: passenger.passportId}))
+          connect: booking.passengers.map((passenger) => ({
+            passportId: passenger.passportId,
+          })),
         },
         user: {
           connect: {
-            id: user.id
-          }
-        }
+            id: user.id,
+          },
+        },
       },
       include: {
         toDestinationRoute: true,
         toOriginRoute: true,
         passengers: true,
-        user: true
-      }
-    })
+        user: true,
+      },
+    });
   }
 }

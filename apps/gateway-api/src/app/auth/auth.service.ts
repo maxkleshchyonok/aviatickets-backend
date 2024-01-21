@@ -1,11 +1,9 @@
-import { JwtService } from '@nestjs/jwt';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Device, Role, RoleTypes, User } from '@prisma/client';
 import { RolesRepo } from 'api/domain/repos/roles.repo';
 import { UsersRepo } from 'api/domain/repos/users.repo';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { SecurityService } from 'api/libs/security/security.service';
-import { UserIdentifier } from 'api/types/model-identifiers.types';
 import { MailerService } from 'api/libs/mailer/mailer.service';
 import { UserDeviceRepo } from 'api/domain/repos/user-device.repo';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
@@ -91,8 +89,6 @@ export class AuthService {
     await this.createDevice(data, hashedCode);
 
     await this.mailerService.sendEmail(data.email, randomResetCode);
-
-    console.log(resetToken);
 
     return resetToken;
   }

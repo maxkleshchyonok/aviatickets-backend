@@ -11,8 +11,8 @@ export class BookingsService {
   constructor(
     private bookingsRepo: BookingsRepo,
     private passengerRepo: PassengersRepo,
-    private flightRepo: FlightsRepo
-    ) { }
+    private flightRepo: FlightsRepo,
+  ) {}
 
   async findAllBookings(query: GetAllBookingsQueryDto) {
     return await this.bookingsRepo.findAllBookings(query);
@@ -30,24 +30,28 @@ export class BookingsService {
     return await this.bookingsRepo.updateUserBooking(updateData);
   }
 
-  async decreaseFlightsAvailableSeatsAmount(flightIds: string[], amount: number) {
-    return await this.flightRepo.decreaseSeatAmount(flightIds, amount)
+  async decreaseFlightsAvailableSeatsAmount(
+    flightIds: string[],
+    amount: number,
+  ) {
+    return await this.flightRepo.decreaseSeatAmount(flightIds, amount);
   }
 
   async createBooking(booking: CreateBookingDto, user: Pick<User, 'id'>) {
-    return await this.bookingsRepo.createBooking(booking, user)
+    return await this.bookingsRepo.createBooking(booking, user);
   }
 
   async createNecessaryPassenger(
-    passenger: Pick<Passenger, 'lastName' | 'firstName' | 'passportId'>) {
-        const exists = await this.passengerRepo.findOneByPassport(passenger)
-        if (!exists) {
-          return await this.passengerRepo.createPassenger(passenger)
-        }
-        return exists
+    passenger: Pick<Passenger, 'lastName' | 'firstName' | 'passportId'>,
+  ) {
+    const exists = await this.passengerRepo.findOneByPassport(passenger);
+    if (!exists) {
+      return await this.passengerRepo.createPassenger(passenger);
+    }
+    return exists;
   }
 
   async findFlight(flight: string) {
-    return await this.flightRepo.findManyById(flight)
+    return await this.flightRepo.findManyById(flight);
   }
 }

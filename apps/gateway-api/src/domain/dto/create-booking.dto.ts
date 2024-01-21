@@ -1,28 +1,25 @@
-import { BookingStatuses, Cities } from "@prisma/client";
-import { RemoveExtraSpaces } from "api/decorators/remove-extra-spaces.decorator";
-import { IsEnum, IsNumber, ValidateNested, IsUUID } from "class-validator";
-import { FlightDto } from "api/domain/dto/flight.dto";
-import { PassengerDto } from "api/domain/dto/passenger.dto";
-import { Type } from "class-transformer";
+import { Cities } from '@prisma/client';
+import { IsEnum, IsNumber, ValidateNested, IsUUID } from 'class-validator';
+import { PassengerDto } from 'api/domain/dto/passenger.dto';
+import { Type } from 'class-transformer';
 
 export class CreateBookingDto {
-    @IsNumber()
-    price: number 
+  @IsNumber()
+  price: number;
 
-    @IsEnum(Cities)
-    origin: Cities
+  @IsEnum(Cities)
+  originCity: Cities;
 
-    @IsEnum(Cities)
-    destination: Cities
+  @IsEnum(Cities)
+  destinationCity: Cities;
 
-    @IsUUID(undefined, {each: true})
-    toDestinationRoute: string[]
+  @IsUUID(undefined, { each: true })
+  toDestinationRoute: string[];
 
-    @IsUUID(undefined, {each: true})
-    toOriginRoute: string[]
+  @IsUUID(undefined, { each: true })
+  toOriginRoute: string[];
 
-    @ValidateNested()
-    @Type(() => PassengerDto)
-    passengers: PassengerDto[]
-
-  }
+  @ValidateNested()
+  @Type(() => PassengerDto)
+  passengers: PassengerDto[];
+}

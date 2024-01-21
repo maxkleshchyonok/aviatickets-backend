@@ -56,24 +56,13 @@ CREATE TABLE "bookings" (
     "id" UUID NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "status" "BookingStatuses" NOT NULL,
+    "status" "BookingStatuses" NOT NULL DEFAULT 'booked',
     "price" INTEGER NOT NULL,
+    "originCity" "Cities" NOT NULL,
+    "destinationCity" "Cities" NOT NULL,
     "user_id" UUID NOT NULL,
 
     CONSTRAINT "bookings_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "booking_items" (
-    "id" UUID NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-    "price" INTEGER NOT NULL,
-    "passenger_id" UUID NOT NULL,
-    "flight_id" UUID NOT NULL,
-    "booking_id" UUID NOT NULL,
-
-    CONSTRAINT "booking_items_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -118,6 +107,24 @@ CREATE TABLE "planes" (
     CONSTRAINT "planes_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "_booking_to_flight_destination" (
+    "A" UUID NOT NULL,
+    "B" UUID NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_booking_to_flight_origin" (
+    "A" UUID NOT NULL,
+    "B" UUID NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_booking_to_passenger" (
+    "A" UUID NOT NULL,
+    "B" UUID NOT NULL
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "roles_id_type_key" ON "roles"("id", "type");
 
@@ -130,6 +137,24 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "passengers_passport_id_key" ON "passengers"("passport_id");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "_booking_to_flight_destination_AB_unique" ON "_booking_to_flight_destination"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_booking_to_flight_destination_B_index" ON "_booking_to_flight_destination"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_booking_to_flight_origin_AB_unique" ON "_booking_to_flight_origin"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_booking_to_flight_origin_B_index" ON "_booking_to_flight_origin"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_booking_to_passenger_AB_unique" ON "_booking_to_passenger"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_booking_to_passenger_B_index" ON "_booking_to_passenger"("B");
+
 -- AddForeignKey
 ALTER TABLE "devices" ADD CONSTRAINT "devices_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -140,13 +165,22 @@ ALTER TABLE "users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KEY ("role_id") 
 ALTER TABLE "bookings" ADD CONSTRAINT "bookings_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "booking_items" ADD CONSTRAINT "booking_items_passenger_id_fkey" FOREIGN KEY ("passenger_id") REFERENCES "passengers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "booking_items" ADD CONSTRAINT "booking_items_flight_id_fkey" FOREIGN KEY ("flight_id") REFERENCES "flights"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "booking_items" ADD CONSTRAINT "booking_items_booking_id_fkey" FOREIGN KEY ("booking_id") REFERENCES "bookings"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "flights" ADD CONSTRAINT "flights_plane_id_fkey" FOREIGN KEY ("plane_id") REFERENCES "planes"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_booking_to_flight_destination" ADD CONSTRAINT "_booking_to_flight_destination_A_fkey" FOREIGN KEY ("A") REFERENCES "bookings"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_booking_to_flight_destination" ADD CONSTRAINT "_booking_to_flight_destination_B_fkey" FOREIGN KEY ("B") REFERENCES "flights"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_booking_to_flight_origin" ADD CONSTRAINT "_booking_to_flight_origin_A_fkey" FOREIGN KEY ("A") REFERENCES "bookings"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_booking_to_flight_origin" ADD CONSTRAINT "_booking_to_flight_origin_B_fkey" FOREIGN KEY ("B") REFERENCES "flights"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_booking_to_passenger" ADD CONSTRAINT "_booking_to_passenger_A_fkey" FOREIGN KEY ("A") REFERENCES "bookings"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_booking_to_passenger" ADD CONSTRAINT "_booking_to_passenger_B_fkey" FOREIGN KEY ("B") REFERENCES "passengers"("id") ON DELETE CASCADE ON UPDATE CASCADE;

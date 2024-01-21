@@ -1,10 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  IsUUID,
-  validate,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsUUID, validate } from 'class-validator';
 
 export class ForgotForm {
   @IsNotEmpty()

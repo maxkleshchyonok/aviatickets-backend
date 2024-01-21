@@ -1,8 +1,5 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
-import { Flight} from "@prisma/client";
-import { ErrorMessage } from "api/enums/error-message.enum";
-import { PrismaService } from "api/libs/prisma/prisma.service";
-
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'api/libs/prisma/prisma.service';
 
 @Injectable()
 export class FlightsRepo {
@@ -10,37 +7,40 @@ export class FlightsRepo {
 
   async findManyById(flightId: string) {
     return await this.prisma.flight.findUnique({
-        where: {
-            id: flightId
-        }
-    })
+      where: {
+        id: flightId,
+      },
+    });
   }
 
   async decreaseSeatAmount(flightIds: string[], amount: number) {
-    await this.prisma.$transaction(async (tx) => {
-      await tx.flight.updateMany({
-        where: {
-          id: {in: flightIds}
-        },
-        data: {
-          availableSeatAmount: {
-            decrement: amount
-          }
-        }
-      })
-      
-      const flights = await tx.flight.findMany({
-        where: {
-          id: {in: flightIds}
-        }
-      })
+    await this.prisma.$transaction(
+      async (tx) => {
+        await tx.flight.updateMany({
+          where: {
+            id: { in: flightIds },
+          },
+          data: {
+            availableSeatAmount: {
+              decrement: amount,
+            },
+          },
+        });
 
-      flights.map((flight) => {
-        if (flight.availableSeatAmount < 0) {
-          return null
-        }
-      })
-    }, {isolationLevel: 'Serializable'})
-    return true
+        const flights = await tx.flight.findMany({
+          where: {
+            id: { in: flightIds },
+          },
+        });
+
+        flights.map((flight) => {
+          if (flight.availableSeatAmount < 0) {
+            return null;
+          }
+        });
+      },
+      { isolationLevel: 'Serializable' },
+    );
+    return true;
   }
 }

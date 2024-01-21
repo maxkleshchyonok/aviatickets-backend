@@ -31,5 +31,5 @@ export enum ErrorMessage {
   DestinationFlightDoesNotExist = 'errors.destination-flight-does-not-exist',
   OriginFlightDoesNotExist = 'errors.origin-flight-does-not-exist',
   PassengerCreationFailed = 'errors.passenger-creation-failed',
-  NotEnoughAvailableSeats = 'errors.not-enough-available-seats'
+  NotEnoughAvailableSeats = 'errors.not-enough-available-seats',
 }
