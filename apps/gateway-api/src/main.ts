@@ -11,7 +11,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter))
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-  app.enableCors({origin: 'http://localhost:3000'});
+  app.enableCors({ origin: 'http://localhost:3000' });
 
   const config = app.get(ConfigService);  
   const port = config.get<number>('app.port');

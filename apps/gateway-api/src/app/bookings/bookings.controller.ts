@@ -1,4 +1,13 @@
-import { Body, Controller, Get, InternalServerErrorException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  InternalServerErrorException,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { BookingsDto } from 'api/domain/dto/bookings.dto';
 import { JwtPermissionsGuard } from 'api/libs/security/guards/jwt-permissions.guard';
 import { BookingsService } from './bookings.service';
@@ -9,7 +18,7 @@ import { BookingDto } from 'api/domain/dto/booking.dto';
 import { CreateBookingForm } from './domain/create-booking.form';
 import { CurrentUser } from 'api/libs/security/decorators/current-user.decorator';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
-import { PassengerAmount } from '../routes/domain/get-routes-query.dto';
+import { PassengerAmount } from '../tickets/domain/get-tickets-query.dto';
 
 @Controller('bookings')
 export class BookingsController {
@@ -25,12 +34,18 @@ export class BookingsController {
 
   @Post(':id')
   //@UseGuards(JwtPermissionsGuard)
-  async updateOneBooking(@Param('id') id: string, @Body() body: UpdateBookingForm) {
+  async updateOneBooking(
+    @Param('id') id: string,
+    @Body() body: UpdateBookingForm,
+  ) {
     const booking = await this.bookingsService.findBookingById(id);
     if (!booking) {
       throw new InternalServerErrorException(ErrorMessage.RecordNotFound);
     }
-    const updatedBooking = await this.bookingsService.updateOneBooking(id, body);
+    const updatedBooking = await this.bookingsService.updateOneBooking(
+      id,
+      body,
+    );
     if (!updatedBooking) {
       throw new InternalServerErrorException(ErrorMessage.RecordUpdationFailed);
     }

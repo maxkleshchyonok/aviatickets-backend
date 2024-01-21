@@ -13,7 +13,7 @@ export class UserSessionDto {
   roleType: RoleTypes;
 
   @IsUUID()
-  deviceId: string
+  deviceId: string;
 
   permissions: UserPermissions[];
 
@@ -27,7 +27,10 @@ export class UserSessionDto {
     return it;
   }
 
-  static toPlainObject(user: User & { role: Role }, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
+  static toPlainObject(
+    user: User & { role: Role },
+    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+  ) {
     return {
       id: user.id,
       deviceId,

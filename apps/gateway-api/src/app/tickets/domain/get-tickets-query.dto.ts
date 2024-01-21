@@ -17,7 +17,7 @@ export enum PassengerAmount {
   Max = 10,
 }
 
-export class GetRoutesQueryDto extends PaginationQueryDto {
+export class GetTicketsQueryDto extends PaginationQueryDto {
   @IsEnum(Cities)
   @RemoveExtraSpaces()
   originCity: Cities;

@@ -18,7 +18,7 @@ export class AuthService {
     private readonly devicesRepo: UserDeviceRepo,
     private readonly securityService: SecurityService,
     private readonly mailerService: MailerService,
-  ) { }
+  ) {}
 
   async findUserByEmail(email: Pick<User, 'email'>['email']) {
     return await this.usersRepo.findOneByEmail(email);
@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   async makeNewUser(
-    user: Pick<User, 'email' | 'password' | 'firstName' | 'lastName'>
+    user: Pick<User, 'email' | 'password' | 'firstName' | 'lastName'>,
   ) {
     const role = await this.rolesRepo.findOneByType(RoleTypes.User);
     if (!role) {
@@ -54,13 +54,19 @@ export class AuthService {
     });
   }
 
-  async authenticate(user: User & { role: Role }, deviceId: Pick<Device, 'deviceId'>['deviceId']) {
-    const accessToken = this.securityService.generateAccessToken(user, deviceId);
+  async authenticate(
+    user: User & { role: Role },
+    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+  ) {
+    const accessToken = this.securityService.generateAccessToken(
+      user,
+      deviceId,
+    );
 
     const data: Pick<User, 'email'> & Pick<Device, 'deviceId'> = {
       email: user.email,
       deviceId: deviceId,
-    }
+    };
 
     await this.createDevice(data, null);
 
@@ -74,9 +80,13 @@ export class AuthService {
   async forgotPassword(data: Pick<User, 'email'> & Pick<Device, 'deviceId'>) {
     const user = await this.usersRepo.findOneByEmail(data.email);
 
-    const resetToken = this.securityService.generateResetToken(user.id, data.deviceId);
+    const resetToken = this.securityService.generateResetToken(
+      user.id,
+      data.deviceId,
+    );
 
-    const { hashedCode, randomResetCode } = this.securityService.generateRandomCode();
+    const { hashedCode, randomResetCode } =
+      this.securityService.generateRandomCode();
 
     await this.createDevice(data, hashedCode);
 
@@ -89,7 +99,7 @@ export class AuthService {
 
   async createDevice(
     data: Pick<User, 'email'> & Pick<Device, 'deviceId'>,
-    resetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode']
+    resetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode'],
   ) {
     const user = await this.usersRepo.findOneByEmail(data.email);
 
@@ -97,11 +107,12 @@ export class AuthService {
       throw new Error(ErrorMessage.UserNotExists);
     }
 
-    const deviceData: Pick<Device, "deviceId" | 'hashedResetCode' | "userId"> = {
-      deviceId: data.deviceId,
-      hashedResetCode: resetCode,
-      userId: user.id,
-    }
+    const deviceData: Pick<Device, 'deviceId' | 'hashedResetCode' | 'userId'> =
+      {
+        deviceId: data.deviceId,
+        hashedResetCode: resetCode,
+        userId: user.id,
+      };
 
     return await this.devicesRepo.createDevice(deviceData);
   }
@@ -109,16 +120,25 @@ export class AuthService {
   async verifyResetCode(code: number, resetToken: string) {
     console.log(code, resetToken);
 
-    const { decodedToken } = this.securityService.decodeResetToken(resetToken.split(' ')[1]);
+    const { decodedToken } = this.securityService.decodeResetToken(
+      resetToken.split(' ')[1],
+    );
 
     const user = await this.usersRepo.findOneById(decodedToken.userId);
 
-    const device = await this.devicesRepo.findOneByUserIdAndDeviceId(user, decodedToken.deviceId);
+    const device = await this.devicesRepo.findOneByUserIdAndDeviceId(
+      user,
+      decodedToken.deviceId,
+    );
 
     const hashedResetCode = this.securityService.hashResetCode(code);
 
     if (device.hashedResetCode === hashedResetCode) {
-      const resetToken = this.securityService.generateResetToken(user.id, device.deviceId, hashedResetCode);
+      const resetToken = this.securityService.generateResetToken(
+        user.id,
+        device.deviceId,
+        hashedResetCode,
+      );
       return resetToken;
     }
 
@@ -126,11 +146,15 @@ export class AuthService {
   }
 
   async resetPassword(password: Pick<User, 'password'>, resetToken: string) {
-    const { decodedToken, isValid } = this.securityService.decodeResetToken(resetToken.split(' ')[1]);
+    const { decodedToken, isValid } = this.securityService.decodeResetToken(
+      resetToken.split(' ')[1],
+    );
 
     const user = await this.usersRepo.findOneById(decodedToken.userId);
 
-    const deviceData = user.devices.find(device => device.deviceId === decodedToken.deviceId);
+    const deviceData = user.devices.find(
+      (device) => device.deviceId === decodedToken.deviceId,
+    );
 
     if (decodedToken.hashedResetCode !== deviceData.hashedResetCode) {
       throw new Error(ErrorMessage.BadVerification);
@@ -144,29 +168,36 @@ export class AuthService {
       throw new Error(ErrorMessage.BadResetToken);
     }
 
-    const hashedPassword = await this.securityService.hashPassword(password.password);
+    const hashedPassword = await this.securityService.hashPassword(
+      password.password,
+    );
 
     const resetData: Pick<User, 'email' | 'password'> = {
       email: user.email,
       password: hashedPassword,
-    }
+    };
 
     await this.devicesRepo.deleteDevice(user.id, deviceData.deviceId);
 
     return await this.usersRepo.resetPassword(resetData);
   }
 
-  async changePassword(userData: UserSessionDto,
-    changeData: { oldPassword: string, newPassword: string, confirmNewPassword: string }) {
+  async changePassword(
+    userData: UserSessionDto,
+    changeData: {
+      oldPassword: string;
+      newPassword: string;
+      confirmNewPassword: string;
+    },
+  ) {
     const user = await this.usersRepo.findOneById(userData.id);
     if (user.password === changeData.oldPassword) {
       const newData: Pick<User, 'id' | 'password'> = {
         id: user.id,
-        password: changeData.newPassword
-      }
+        password: changeData.newPassword,
+      };
       return this.usersRepo.changePassword(newData);
     }
     return null;
   }
-
 }

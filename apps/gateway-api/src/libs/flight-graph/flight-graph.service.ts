@@ -12,7 +12,7 @@ interface FindRouteOptions {
 interface FindRouteDfs {
   currentCity: string;
   route: Flight[];
-  previousFlightArrivalTime: Date;
+  previousFlightArrivalTime: number;
   visitedCities: Set<string>;
   routes: Route[];
 }
@@ -90,7 +90,7 @@ export class FlightGraphService {
         const data: FindRouteDfs = {
           currentCity: flight.destinationCity,
           route: [flight],
-          previousFlightArrivalTime: flight.arrivalTime,
+          previousFlightArrivalTime: flight.arrivalTime.getTime(),
           visitedCities,
           routes,
         };
@@ -131,7 +131,7 @@ export class FlightGraphService {
     for (const flight of flightsFromCurrentCity) {
       if (
         !visitedCities.has(flight.destinationCity) &&
-        flight.departureTime >= previousFlightArrivalTime
+        flight.departureTime.getTime() >= previousFlightArrivalTime
       ) {
         const newRoute = route.slice();
         newRoute.push(flight);
@@ -141,7 +141,7 @@ export class FlightGraphService {
           routes,
           route: newRoute,
           currentCity: flight.destinationCity,
-          previousFlightArrivalTime: flight.arrivalTime,
+          previousFlightArrivalTime: flight.arrivalTime.getTime(),
         };
         this.dfs(data, flightConditions);
       }

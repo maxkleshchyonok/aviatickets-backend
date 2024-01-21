@@ -28,7 +28,7 @@ export class BookingsRepo {
       this.prisma.booking.count({ where: prismaQuery.where }),
       this.prisma.booking.findMany(prismaQuery),
     ]);
-    
+
     return { count, bookings };
   }
 
@@ -80,7 +80,7 @@ export class BookingsRepo {
         toOriginRoute: true,
         toDestinationRoute: true,
         passengers: true,
-        user: true 
+        user: true,
       },
     });
   }

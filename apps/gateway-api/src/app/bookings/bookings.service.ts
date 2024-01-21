@@ -25,7 +25,7 @@ export class BookingsService {
   async updateOneBooking(id: string, body: Pick<Booking, 'status'>) {
     const updateData: Pick<Booking, 'id' | 'status'> = {
       id,
-      status: body.status
+      status: body.status,
     };
     return await this.bookingsRepo.updateUserBooking(updateData);
   }

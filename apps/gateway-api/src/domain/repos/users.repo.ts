@@ -28,7 +28,7 @@ export class UsersRepo {
     return await this.prisma.user.findUnique({
       where: { id },
       include: {
-        devices: true
+        devices: true,
       },
     });
   }
@@ -37,8 +37,8 @@ export class UsersRepo {
     return await this.prisma.user.findUnique({
       where: { email },
       include: {
-        devices: true
-      }
+        devices: true,
+      },
     });
   }
 
@@ -83,19 +83,18 @@ export class UsersRepo {
       where: { email: resetData.email },
       data: {
         password: resetData.password,
-      }
+      },
     });
   }
 
   async changePassword(data: Pick<User, 'id' | 'password'>) {
     return await this.prisma.user.update({
       where: {
-        id: data.id
+        id: data.id,
       },
       data: {
-        password: data.password
-      }
+        password: data.password,
+      },
     });
   }
-
 }

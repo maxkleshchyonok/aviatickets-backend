@@ -1,4 +1,4 @@
-export enum  ErrorMessage {
+export enum ErrorMessage {
   InvalidForm = 'errors.invalid-form',
   FieldShouldBeString = 'errors.field-invalid.should-be-string',
   FieldShouldBeNumber = 'errors.field-invalid.should-be-number',
@@ -21,9 +21,9 @@ export enum  ErrorMessage {
   RecordUpdationFailed = 'errors.record-updation-failed',
   RecordDeletionFailed = 'errors.record-deletion-failed',
   NotExists_Record = 'errors.not-exists-record',
-  UserNotExists = "errors.not-exist-user",
+  UserNotExists = 'errors.not-exist-user',
   UserAlreadyExists = 'errors.user-already-exists',
-  RecordNotExists = "errors.not-exist-record",
+  RecordNotExists = 'errors.not-exist-record',
   BadResetToken = 'errors.bad-reset-token',
   BadVerification = 'errors.verification-failed',
   NotAuthorizedDevice = 'errors.bad-device',

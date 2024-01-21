@@ -3,9 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from 'api/app/auth/auth.module';
 import appConfig from 'api/config/app.config';
 import securityConfig from 'api/config/security.config';
-import { RoutesModule } from 'api/app/routes/routes.module';
+import { TicketsModule } from 'api/app/tickets/tickets.module';
 import { UsersModule } from 'api/app/users/users.module';
 import { BookingsModule } from './app/bookings/bookings.module';
+import { CitiesModule } from './app/cities/cities.module';
 
 @Module({
   imports: [
@@ -15,9 +16,10 @@ import { BookingsModule } from './app/bookings/bookings.module';
       isGlobal: true,
     }),
     AuthModule,
-    RoutesModule,
+    TicketsModule,
     UsersModule,
     BookingsModule,
+    CitiesModule,
   ],
 })
 export class AppModule {}

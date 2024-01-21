@@ -5,5 +5,4 @@ import { MailerService } from 'api/libs/mailer/mailer.service';
   providers: [MailerService],
   exports: [MailerService],
 })
-
 export class MailerModule {}
