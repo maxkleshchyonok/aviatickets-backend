@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Booking, Prisma } from '@prisma/client';
+import { Booking, User, Prisma } from '@prisma/client';
 import { GetAllBookingsQueryDto } from 'api/app/bookings/domain/get-all-bookings-query.dto';
 import { GetAllUserBookingsQueryDto } from 'api/app/users/domain/get-all-user-bookings.dto';
 import { PrismaService } from 'api/libs/prisma/prisma.service';
 import { UserIdentifier } from 'api/types/model-identifiers.types';
+import { CreateBookingDto } from '../dto/create-booking.dto';
 
 @Injectable()
 export class BookingsRepo {
@@ -82,5 +83,33 @@ export class BookingsRepo {
         user: true 
       },
     });
+  }
+
+  async createBooking(booking: CreateBookingDto, user: Pick<User, 'id'>) {
+    return await this.prisma.booking.create({
+      data: {
+        ...booking,
+        toDestinationRoute: {
+          connect: booking.toDestinationRoute.map((id) => ({id: id}))
+        },
+        toOriginRoute: {
+          connect: booking.toOriginRoute.map((id) => ({id: id}))
+        },
+        passengers: {
+          connect: booking.passengers.map((passenger) =>({passportId: passenger.passportId}))
+        },
+        user: {
+          connect: {
+            id: user.id
+          }
+        }
+      },
+      include: {
+        toDestinationRoute: true,
+        toOriginRoute: true,
+        passengers: true,
+        user: true
+      }
+    })
   }
 }
