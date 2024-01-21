@@ -1,6 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Flight } from '@prisma/client';
-import { ErrorMessage } from 'api/enums/error-message.enum';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'api/libs/prisma/prisma.service';
 
 @Injectable()

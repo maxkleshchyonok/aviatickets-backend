@@ -18,7 +18,6 @@ import { BookingDto } from 'api/domain/dto/booking.dto';
 import { CreateBookingForm } from './domain/create-booking.form';
 import { CurrentUser } from 'api/libs/security/decorators/current-user.decorator';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
-import { PassengerAmount } from '../tickets/domain/get-tickets-query.dto';
 
 @Controller('bookings')
 export class BookingsController {

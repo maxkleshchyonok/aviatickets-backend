@@ -1,7 +1,5 @@
-import { BookingStatuses, Cities } from '@prisma/client';
-import { RemoveExtraSpaces } from 'api/decorators/remove-extra-spaces.decorator';
+import { Cities } from '@prisma/client';
 import { IsEnum, IsNumber, ValidateNested, IsUUID } from 'class-validator';
-import { FlightDto } from 'api/domain/dto/flight.dto';
 import { PassengerDto } from 'api/domain/dto/passenger.dto';
 import { Type } from 'class-transformer';
 
