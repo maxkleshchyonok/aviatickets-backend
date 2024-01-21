@@ -9,11 +9,9 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    response
-    .status(500)
-    .json({
-        statusCode: 500,
-        message: 'Internal server error. Try again later'
-    })
+    response.status(500).json({
+      statusCode: 500,
+      message: 'Internal server error. Try again later',
+    });
   }
 }

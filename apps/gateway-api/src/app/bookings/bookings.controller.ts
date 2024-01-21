@@ -22,8 +22,7 @@ import { PassengerAmount } from '../tickets/domain/get-tickets-query.dto';
 
 @Controller('bookings')
 export class BookingsController {
-  constructor(
-    private readonly bookingsService: BookingsService) {}
+  constructor(private readonly bookingsService: BookingsService) {}
 
   @Get()
   @UseGuards(JwtPermissionsGuard)
@@ -54,40 +53,54 @@ export class BookingsController {
 
   @Post()
   @UseGuards(JwtPermissionsGuard)
-  async createBooking(@Body() body: CreateBookingForm, @CurrentUser() user: UserSessionDto) {
+  async createBooking(
+    @Body() body: CreateBookingForm,
+    @CurrentUser() user: UserSessionDto,
+  ) {
     body.toDestinationRoute.map(async (flightId) => {
-      const existingFlight = await this.bookingsService.findFlight(flightId)
+      const existingFlight = await this.bookingsService.findFlight(flightId);
       if (!existingFlight) {
-        throw new InternalServerErrorException(ErrorMessage.DestinationFlightDoesNotExist)
+        throw new InternalServerErrorException(
+          ErrorMessage.DestinationFlightDoesNotExist,
+        );
       }
-    })
+    });
 
     body.toOriginRoute.map(async (flightId) => {
-      const existingFlight = await this.bookingsService.findFlight(flightId)
+      const existingFlight = await this.bookingsService.findFlight(flightId);
       if (!existingFlight) {
-        throw new InternalServerErrorException(ErrorMessage.OriginFlightDoesNotExist)
+        throw new InternalServerErrorException(
+          ErrorMessage.OriginFlightDoesNotExist,
+        );
       }
-    })
+    });
 
     body.passengers.map(async (passenger) => {
-      const createdPassenger = await this.bookingsService.createNecessaryPassenger(passenger)
+      const createdPassenger =
+        await this.bookingsService.createNecessaryPassenger(passenger);
       if (!createdPassenger) {
-        throw new InternalServerErrorException(ErrorMessage.PassengerCreationFailed)
+        throw new InternalServerErrorException(
+          ErrorMessage.PassengerCreationFailed,
+        );
       }
-    })
+    });
 
-    const enoughAvailableSeats = await this.bookingsService.decreaseFlightsAvailableSeatsAmount(
-      body.toOriginRoute.concat(body.toDestinationRoute), body.passengers.length
-    )
+    const enoughAvailableSeats =
+      await this.bookingsService.decreaseFlightsAvailableSeatsAmount(
+        body.toOriginRoute.concat(body.toDestinationRoute),
+        body.passengers.length,
+      );
     if (!enoughAvailableSeats) {
-      throw new InternalServerErrorException(ErrorMessage.NotEnoughAvailableSeats)
+      throw new InternalServerErrorException(
+        ErrorMessage.NotEnoughAvailableSeats,
+      );
     }
 
-    const booking = await this.bookingsService.createBooking(body, user)
+    const booking = await this.bookingsService.createBooking(body, user);
     if (!booking) {
-      throw new InternalServerErrorException(ErrorMessage.RecordCreationFailed)
+      throw new InternalServerErrorException(ErrorMessage.RecordCreationFailed);
     }
 
-    return BookingDto.fromEntity(booking)
+    return BookingDto.fromEntity(booking);
   }
 }

@@ -1,7 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { Passenger } from "@prisma/client";
-import { PrismaService } from "api/libs/prisma/prisma.service";
-
+import { Injectable } from '@nestjs/common';
+import { Passenger } from '@prisma/client';
+import { PrismaService } from 'api/libs/prisma/prisma.service';
 
 @Injectable()
 export class PassengersRepo {
@@ -9,17 +8,19 @@ export class PassengersRepo {
 
   async findOneByPassport(passenger: Pick<Passenger, 'passportId'>) {
     return await this.prisma.passenger.findUnique({
-      where: { 
-        passportId: passenger.passportId
+      where: {
+        passportId: passenger.passportId,
       },
     });
   }
 
-  async createPassenger(passenger: Pick<Passenger, 'lastName' | 'firstName' | 'passportId'>) {
+  async createPassenger(
+    passenger: Pick<Passenger, 'lastName' | 'firstName' | 'passportId'>,
+  ) {
     return await this.prisma.passenger.create({
-        data: {
-            ...passenger
-        }
-    })
+      data: {
+        ...passenger,
+      },
+    });
   }
 }

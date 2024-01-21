@@ -90,26 +90,28 @@ export class BookingsRepo {
       data: {
         ...booking,
         toDestinationRoute: {
-          connect: booking.toDestinationRoute.map((id) => ({id: id}))
+          connect: booking.toDestinationRoute.map((id) => ({ id: id })),
         },
         toOriginRoute: {
-          connect: booking.toOriginRoute.map((id) => ({id: id}))
+          connect: booking.toOriginRoute.map((id) => ({ id: id })),
         },
         passengers: {
-          connect: booking.passengers.map((passenger) =>({passportId: passenger.passportId}))
+          connect: booking.passengers.map((passenger) => ({
+            passportId: passenger.passportId,
+          })),
         },
         user: {
           connect: {
-            id: user.id
-          }
-        }
+            id: user.id,
+          },
+        },
       },
       include: {
         toDestinationRoute: true,
         toOriginRoute: true,
         passengers: true,
-        user: true
-      }
-    })
+        user: true,
+      },
+    });
   }
 }
