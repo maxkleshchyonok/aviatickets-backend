@@ -8,10 +8,10 @@ export class CreateBookingDto {
   price: number;
 
   @IsEnum(Cities)
-  origin: Cities;
+  originCity: Cities;
 
   @IsEnum(Cities)
-  destination: Cities;
+  destinationCity: Cities;
 
   @IsUUID(undefined, { each: true })
   toDestinationRoute: string[];

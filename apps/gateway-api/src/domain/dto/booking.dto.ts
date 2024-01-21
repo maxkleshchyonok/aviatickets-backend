@@ -15,8 +15,8 @@ export class BookingDto extends UUIDDto {
   status: BookingStatuses;
   price: number;
   user: UserDto;
-  origin: Cities;
-  destination: Cities;
+  originCity: Cities;
+  destinationCity: Cities;
   passengers: PassengerDto[];
   toDestinationRoute: FlightDto[];
   toOriginRoute: FlightDto[];
@@ -36,8 +36,8 @@ export class BookingDto extends UUIDDto {
     it.updatedAt = entity.updatedAt.valueOf();
     it.status = entity.status;
     it.price = entity.price;
-    it.destination = entity.destination;
-    it.origin = entity.origin;
+    it.destinationCity = entity.destinationCity;
+    it.originCity = entity.originCity;
     it.user = UserDto.fromEntity(entity.user);
     it.passengers = PassengerDto.fromEntities(entity.passengers);
     it.toDestinationRoute = FlightDto.fromEntities(entity.toDestinationRoute);

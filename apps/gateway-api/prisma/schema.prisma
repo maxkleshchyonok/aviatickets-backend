@@ -137,8 +137,8 @@ model Booking {
   status BookingStatuses @default(Booked)
   price  Int
 
-  origin      Cities
-  destination Cities
+  originCity      Cities
+  destinationCity Cities
 
   toDestinationRoute Flight[] @relation("booking_to_flight_destination")
   toOriginRoute      Flight[] @relation("booking_to_flight_origin")
