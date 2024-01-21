@@ -28,4 +28,8 @@ export enum ErrorMessage {
   BadVerification = 'errors.verification-failed',
   NotAuthorizedDevice = 'errors.bad-device',
   BadPassword = 'errors.passwords-dont-match',
+  DestinationFlightDoesNotExist = 'errors.destination-flight-does-not-exist',
+  OriginFlightDoesNotExist = 'errors.origin-flight-does-not-exist',
+  PassengerCreationFailed = 'errors.passenger-creation-failed',
+  NotEnoughAvailableSeats = 'errors.not-enough-available-seats'
 }

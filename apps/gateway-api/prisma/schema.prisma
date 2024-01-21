@@ -134,7 +134,7 @@ model Booking {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  status BookingStatuses
+  status BookingStatuses @default(Booked)
   price  Int
 
   origin      Cities

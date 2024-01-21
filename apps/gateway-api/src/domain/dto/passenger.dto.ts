@@ -1,9 +1,15 @@
 import { Passenger } from '@prisma/client';
 import { UUIDDto } from './uuid.dto';
+import { IsString } from 'class-validator';
 
 export class PassengerDto extends UUIDDto {
+  @IsString()
   firstName: string;
+
+  @IsString()
   lastName: string;
+
+  @IsString()
   passportId: string;
 
   static fromEntity(entity?: Passenger) {
