@@ -8,7 +8,6 @@ export class SignInForm {
   @RemoveExtraSpaces()
   email: string;
 
-  @Matches(STRONG_PASSWORD_REG_EXP)
   @IsString()
   @RemoveExtraSpaces()
   password: string;
