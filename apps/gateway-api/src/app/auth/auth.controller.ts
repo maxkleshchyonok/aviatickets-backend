@@ -17,7 +17,7 @@ import { JwtPermissionsGuard } from 'libs/security/guards/jwt-permissions.guard'
 import { AuthService } from 'api/app/auth/auth.service';
 import { SignInForm } from 'api/app/auth/dto/signin.form';
 import { SignUpForm } from 'api/app/auth/dto/signup.form';
-import { ForgotForm } from 'api/app/auth/dto/forgot.form';
+import { ForgotPasswordForm } from 'api/app/auth/dto/forgot-password.form';
 import { VerifyForm } from 'api/app/auth/dto/verify.form';
 import { ResetForm } from 'api/app/auth/dto/reset.form';
 import { ChangePasswordForm } from './dto/change.form';
@@ -28,7 +28,7 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() body: SignUpForm) {
-    const userEntity = await this.authService.findUserByEmail(body.email);
+    const userEntity = await this.authService.findUserByEmail(body);
     if (userEntity) {
       throw new InternalServerErrorException(ErrorMessage.UserAlreadyExists);
     }
@@ -44,7 +44,7 @@ export class AuthController {
 
     const accessToken = await this.authService.authenticate(
       newUserEntity,
-      body.deviceId,
+      body,
     );
 
     return AuthDto.from({
@@ -63,10 +63,7 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserNotExists);
     }
 
-    const accessToken = await this.authService.authenticate(
-      userEntity,
-      body.deviceId,
-    );
+    const accessToken = await this.authService.authenticate(userEntity, body);
 
     return AuthDto.from({
       accessToken,
@@ -94,8 +91,29 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  async forgotPassword(@Body() body: ForgotForm) {
-    return await this.authService.forgotPassword(body);
+  async forgotPassword(@Body() body: ForgotPasswordForm) {
+    const userEntity = await this.authService.findUserByEmail(body);
+    if (!userEntity) {
+      throw new InternalServerErrorException(ErrorMessage.UserNotExists);
+    }
+
+    const resetToken = this.authService.generateResetToken(userEntity, body);
+    const resetCode = this.authService.generateResetCode();
+
+    const messageInfo = await this.authService.sendResetCodeToUserByEmail(
+      userEntity,
+      resetCode,
+    );
+
+    if (!messageInfo) {
+      throw new InternalServerErrorException('Failed to send message');
+    }
+
+    const hashedResetCode = this.authService.hashResetCode(resetCode);
+
+    await this.authService.createDevice(userEntity, body, hashedResetCode);
+
+    return resetToken;
   }
 
   @Post('verify')

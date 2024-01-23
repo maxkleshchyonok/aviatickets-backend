@@ -33,9 +33,9 @@ export class UsersRepo {
     });
   }
 
-  async findOneByEmail(email: Pick<User, 'email'>['email']) {
+  async findOneByEmail(user: Pick<User, 'email'>) {
     return await this.prisma.user.findUnique({
-      where: { email },
+      where: { email: user.email },
       include: {
         devices: true,
       },

@@ -18,8 +18,8 @@ export class AuthService {
     private readonly mailerService: MailerService,
   ) {}
 
-  async findUserByEmail(email: Pick<User, 'email'>['email']) {
-    return await this.usersRepo.findOneByEmail(email);
+  async findUserByEmail(user: Pick<User, 'email'>) {
+    return await this.usersRepo.findOneByEmail(user);
   }
 
   async findUserByEmailAndPassword(user: Pick<User, 'email' | 'password'>) {
@@ -32,9 +32,9 @@ export class AuthService {
 
   async findDeviceByUserIdAndDeviceId(
     user: Pick<User, 'id'>,
-    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+    device: Pick<Device, 'deviceId'>,
   ) {
-    return await this.devicesRepo.findOneByUserIdAndDeviceId(user, deviceId);
+    return await this.devicesRepo.findOneByUserIdAndDeviceId(user, device);
   }
 
   async makeNewUser(
@@ -61,19 +61,11 @@ export class AuthService {
 
   async authenticate(
     user: User & { role: Role },
-    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+    device: Pick<Device, 'deviceId'>,
   ) {
-    const accessToken = this.securityService.generateAccessToken(
-      user,
-      deviceId,
-    );
+    const accessToken = this.securityService.generateAccessToken(user, device);
 
-    const data: Pick<User, 'email'> & Pick<Device, 'deviceId'> = {
-      email: user.email,
-      deviceId: deviceId,
-    };
-
-    await this.createDevice(data, null);
+    await this.createDevice(user, device, null);
 
     return accessToken;
   }
@@ -82,47 +74,52 @@ export class AuthService {
     return await this.devicesRepo.deleteDevice(user.id, user.deviceId);
   }
 
-  async forgotPassword(data: Pick<User, 'email'> & Pick<Device, 'deviceId'>) {
-    const user = await this.usersRepo.findOneByEmail(data.email);
+  async generateResetToken(
+    user: Pick<User, 'id'>,
+    device: Pick<Device, 'deviceId'>,
+  ) {
+    return this.securityService.generateResetToken(user, device);
+  }
 
-    const resetToken = this.securityService.generateResetToken(
-      user.id,
-      data.deviceId,
-    );
+  generateResetCode(): number {
+    return this.securityService.generateResetCode();
+  }
 
-    const { hashedCode, randomResetCode } =
-      this.securityService.generateRandomCode();
+  hashResetCode(resetCode: number): string {
+    return this.securityService.hashResetCode(resetCode);
+  }
 
-    await this.createDevice(data, hashedCode);
-
-    await this.mailerService.sendEmail(data.email, randomResetCode);
-
-    return resetToken;
+  async sendResetCodeToUserByEmail(
+    user: Pick<User, 'email'>,
+    resetCode: number,
+  ) {
+    return await this.mailerService.sendEmail(user.email, resetCode);
   }
 
   async createDevice(
-    data: Pick<User, 'email'> & Pick<Device, 'deviceId'>,
+    user: Pick<User, 'email'>,
+    device: Pick<Device, 'deviceId'>,
     resetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode'],
   ) {
-    const user = await this.usersRepo.findOneByEmail(data.email);
-    const device = await this.devicesRepo.findOneByUserIdAndDeviceId(
-      user,
-      data.deviceId,
-    );
-
-    if (!user) {
+    const userEntity = await this.usersRepo.findOneByEmail(user);
+    if (!userEntity) {
       throw new Error(ErrorMessage.UserNotExists);
     }
 
-    if (device) {
-      return device;
+    const deviceEntity = await this.devicesRepo.findOneByUserIdAndDeviceId(
+      userEntity,
+      device,
+    );
+
+    if (deviceEntity) {
+      return deviceEntity;
     }
 
     const deviceData: Pick<Device, 'deviceId' | 'hashedResetCode' | 'userId'> =
       {
-        deviceId: data.deviceId,
+        deviceId: device.deviceId,
         hashedResetCode: resetCode,
-        userId: user.id,
+        userId: userEntity.id,
       };
 
     return await this.devicesRepo.createDevice(deviceData);
@@ -146,8 +143,8 @@ export class AuthService {
 
     if (device.hashedResetCode === hashedResetCode) {
       const resetToken = this.securityService.generateResetToken(
-        user.id,
-        device.deviceId,
+        user,
+        device,
         hashedResetCode,
       );
       return resetToken;
