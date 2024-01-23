@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -28,26 +29,6 @@ export class BookingsController {
   async getAllBookings(@Query() query: GetAllBookingsQueryDto) {
     const bookingsWithCount = await this.bookingsService.findAllBookings(query);
     return BookingsDto.fromResponse(bookingsWithCount);
-  }
-
-  @Post(':id')
-  //@UseGuards(JwtPermissionsGuard)
-  async updateOneBooking(
-    @Param('id') id: string,
-    @Body() body: UpdateBookingForm,
-  ) {
-    const booking = await this.bookingsService.findBookingById(id);
-    if (!booking) {
-      throw new InternalServerErrorException(ErrorMessage.RecordNotFound);
-    }
-    const updatedBooking = await this.bookingsService.updateOneBooking(
-      id,
-      body,
-    );
-    if (!updatedBooking) {
-      throw new InternalServerErrorException(ErrorMessage.RecordUpdationFailed);
-    }
-    return BookingDto.fromEntity(updatedBooking);
   }
 
   @Post()
@@ -95,11 +76,34 @@ export class BookingsController {
       );
     }
 
-    const booking = await this.bookingsService.createBooking(body, user);
+    const booking = await this.bookingsService.createBooking(user, body);
     if (!booking) {
       throw new InternalServerErrorException(ErrorMessage.RecordCreationFailed);
     }
 
     return BookingDto.fromEntity(booking);
+  }
+
+  @Put(':bookingId')
+  @UseGuards(JwtPermissionsGuard)
+  async updateBooking(
+    @Param('bookingId') bookingId: string,
+    @Body() body: UpdateBookingForm,
+  ) {
+    const booking = { id: bookingId };
+    const bookingEntity = await this.bookingsService.findBookingById(booking);
+    if (!bookingEntity) {
+      throw new InternalServerErrorException(ErrorMessage.RecordNotFound);
+    }
+
+    const updatedBookingEntity = await this.bookingsService.updateBooking(
+      booking,
+      body,
+    );
+    if (!updatedBookingEntity) {
+      throw new InternalServerErrorException(ErrorMessage.RecordUpdationFailed);
+    }
+
+    return BookingDto.fromEntity(updatedBookingEntity);
   }
 }

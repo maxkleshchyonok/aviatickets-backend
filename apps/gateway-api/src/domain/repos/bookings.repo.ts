@@ -3,7 +3,10 @@ import { Booking, User, Prisma } from '@prisma/client';
 import { GetAllBookingsQueryDto } from 'api/app/bookings/domain/get-all-bookings-query.dto';
 import { GetAllUserBookingsQueryDto } from 'api/app/users/domain/get-all-user-bookings.dto';
 import { PrismaService } from 'libs/prisma/prisma.service';
-import { UserIdentifier } from 'api/types/model-identifiers.types';
+import {
+  BookingIdentifier,
+  UserIdentifier,
+} from 'api/types/model-identifiers.types';
 import { CreateBookingDto } from '../dto/create-booking.dto';
 
 @Injectable()
@@ -76,9 +79,9 @@ export class BookingsRepo {
     return { count, bookings };
   }
 
-  async findOneById(id: Pick<Booking, 'id'>['id']) {
+  async findOneById(booking: BookingIdentifier) {
     return await this.prisma.booking.findUnique({
-      where: { id },
+      where: { id: booking.id },
       include: {
         toOriginRoute: {
           orderBy: {
@@ -96,37 +99,12 @@ export class BookingsRepo {
     });
   }
 
-  async updateUserBooking(bookingData: Pick<Booking, 'id' | 'status'>) {
-    const { id, status } = bookingData;
-    return await this.prisma.booking.update({
-      where: { id },
-      data: { status },
-      include: {
-        toOriginRoute: {
-          orderBy: {
-            departureTime: 'asc',
-          },
-        },
-        toDestinationRoute: {
-          orderBy: {
-            departureTime: 'asc',
-          },
-        },
-        passengers: true,
-        user: true,
-      },
-    });
-  }
-
-  async createBooking(booking: CreateBookingDto, user: Pick<User, 'id'>) {
+  async createBooking(user: Pick<User, 'id'>, booking: CreateBookingDto) {
     return await this.prisma.booking.create({
       data: {
         ...booking,
         toDestinationRoute: {
-          connect: booking.toDestinationRoute.map((id) => {
-            console.log(id);
-            return { id: id };
-          }),
+          connect: booking.toDestinationRoute.map((id) => ({ id: id })),
         },
         toOriginRoute: {
           connect: booking.toOriginRoute.map((id) => ({ id: id })),
@@ -142,6 +120,30 @@ export class BookingsRepo {
           },
         },
       },
+      include: {
+        toOriginRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
+        toDestinationRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
+        passengers: true,
+        user: true,
+      },
+    });
+  }
+
+  async updateOne(
+    bookingId: BookingIdentifier,
+    booking: Pick<Booking, 'status'>,
+  ) {
+    return await this.prisma.booking.update({
+      where: { id: bookingId.id },
+      data: { status: booking.status },
       include: {
         toOriginRoute: {
           orderBy: {

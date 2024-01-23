@@ -5,6 +5,7 @@ import { Booking, Passenger, User } from '@prisma/client';
 import { PassengersRepo } from 'api/domain/repos/passengers.repo';
 import { FlightsRepo } from 'api/domain/repos/flights.repo';
 import { CreateBookingDto } from 'api/domain/dto/create-booking.dto';
+import { BookingIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()
 export class BookingsService {
@@ -18,16 +19,15 @@ export class BookingsService {
     return await this.bookingsRepo.findAllBookings(query);
   }
 
-  async findBookingById(id: Pick<Booking, 'id'>['id']) {
-    return await this.bookingsRepo.findOneById(id);
+  async findBookingById(booking: BookingIdentifier) {
+    return await this.bookingsRepo.findOneById(booking);
   }
 
-  async updateOneBooking(id: string, body: Pick<Booking, 'status'>) {
-    const updateData: Pick<Booking, 'id' | 'status'> = {
-      id,
-      status: body.status,
-    };
-    return await this.bookingsRepo.updateUserBooking(updateData);
+  async updateBooking(
+    bookingId: BookingIdentifier,
+    booking: Pick<Booking, 'status'>,
+  ) {
+    return await this.bookingsRepo.updateOne(bookingId, booking);
   }
 
   async decreaseFlightsAvailableSeatsAmount(
@@ -37,8 +37,8 @@ export class BookingsService {
     return await this.flightRepo.decreaseSeatAmount(flightIds, amount);
   }
 
-  async createBooking(booking: CreateBookingDto, user: Pick<User, 'id'>) {
-    return await this.bookingsRepo.createBooking(booking, user);
+  async createBooking(user: Pick<User, 'id'>, booking: CreateBookingDto) {
+    return await this.bookingsRepo.createBooking(user, booking);
   }
 
   async createNecessaryPassenger(
