@@ -198,7 +198,7 @@ export class AuthService {
       confirmNewPassword: string;
     },
   ) {
-    const user = await this.usersRepo.findOneById(userData.id);
+    const user = await this.usersRepo.findOneById(userData);
     if (user.password === changeData.oldPassword) {
       const newData: Pick<User, 'id' | 'password'> = {
         id: user.id,

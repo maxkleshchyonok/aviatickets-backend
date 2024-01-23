@@ -39,13 +39,13 @@ export class UsersController {
     @CurrentUser() user: UserSessionDto,
     @Query() query: GetAllUserBookingsQueryDto,
   ) {
-    const userEntity = await this.usersService.findUserById(user.id);
+    const userEntity = await this.usersService.findUserById(user);
     if (!userEntity) {
       throw new InternalServerErrorException(ErrorMessage.RecordNotExists);
     }
 
     const userBookingsWithCount = await this.usersService.findAllUserBookings(
-      user.id,
+      user,
       query,
     );
 
@@ -55,7 +55,7 @@ export class UsersController {
   @Get('me')
   @UseGuards(JwtPermissionsGuard)
   async getUser(@CurrentUser() user: UserSessionDto) {
-    const userEntity = await this.usersService.findUserById(user.id);
+    const userEntity = await this.usersService.findUserById(user);
     if (!userEntity) {
       throw new InternalServerErrorException(ErrorMessage.RecordNotExists);
     }
@@ -69,12 +69,13 @@ export class UsersController {
     @Param('userId', ParseUUIDPipe) userId: string,
     @Body() form: UpdateUserForm,
   ) {
-    const userEntity = await this.usersService.findUserById(userId);
+    const user = { id: userId };
+    const userEntity = await this.usersService.findUserById(user);
     if (!userEntity) {
       throw new InternalServerErrorException(ErrorMessage.RecordNotExists);
     }
 
-    const updatedUserEntity = await this.usersService.updateUser(userId, form);
+    const updatedUserEntity = await this.usersService.updateUser(user, form);
     if (!updatedUserEntity) {
       throw new InternalServerErrorException(ErrorMessage.RecordUpdationFailed);
     }

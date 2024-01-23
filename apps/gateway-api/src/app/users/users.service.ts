@@ -18,20 +18,20 @@ export class UsersService {
   }
 
   async findAllUserBookings(
-    userId: UserIdentifier,
+    user: UserIdentifier,
     query: GetAllUserBookingsQueryDto,
   ) {
-    return await this.bookingsRepo.findAllUserBookings(userId, query);
+    return await this.bookingsRepo.findAllUserBookings(user, query);
   }
 
-  async findUserById(id: UserIdentifier) {
-    return await this.usersRepo.findOneById(id);
+  async findUserById(user: UserIdentifier) {
+    return await this.usersRepo.findOneById(user);
   }
 
   async updateUser(
-    id: UserIdentifier,
+    userId: UserIdentifier,
     user: Pick<User, 'firstName' | 'lastName'>,
   ) {
-    return await this.usersRepo.updateOne(id, user);
+    return await this.usersRepo.updateOne(userId, user);
   }
 }

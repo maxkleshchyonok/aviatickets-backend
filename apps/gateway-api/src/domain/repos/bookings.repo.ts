@@ -44,7 +44,7 @@ export class BookingsRepo {
   }
 
   async findAllUserBookings(
-    userId: UserIdentifier,
+    user: UserIdentifier,
     query: GetAllUserBookingsQueryDto,
   ) {
     const { pageNumber, pageSize } = query;
@@ -67,7 +67,7 @@ export class BookingsRepo {
         user: true,
       },
       where: {
-        userId,
+        userId: user.id,
       },
     };
 
