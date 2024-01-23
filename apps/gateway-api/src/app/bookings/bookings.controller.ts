@@ -9,14 +9,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BookingsDto } from 'api/domain/dto/bookings.dto';
-import { JwtPermissionsGuard } from 'api/libs/security/guards/jwt-permissions.guard';
+import { JwtPermissionsGuard } from 'libs/security/guards/jwt-permissions.guard';
 import { BookingsService } from './bookings.service';
 import { GetAllBookingsQueryDto } from './domain/get-all-bookings-query.dto';
 import { UpdateBookingForm } from './domain/updateBooking.form';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { BookingDto } from 'api/domain/dto/booking.dto';
 import { CreateBookingForm } from './domain/create-booking.form';
-import { CurrentUser } from 'api/libs/security/decorators/current-user.decorator';
+import { CurrentUser } from 'libs/security/decorators/current-user.decorator';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 
 @Controller('bookings')
