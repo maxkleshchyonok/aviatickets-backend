@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { PrismaService } from 'api/libs/prisma/prisma.service';
+import { PrismaService } from 'libs/prisma/prisma.service';
 
 @Injectable()
 export class FlightsRepo {
