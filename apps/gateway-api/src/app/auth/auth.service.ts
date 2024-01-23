@@ -30,6 +30,13 @@ export class AuthService {
     return this.usersRepo.findOneByEmailAndPassword(user.email, hashedPassword);
   }
 
+  async findDeviceByUserIdAndDeviceId(
+    user: Pick<User, 'id'>,
+    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+  ) {
+    return await this.devicesRepo.findOneByUserIdAndDeviceId(user, deviceId);
+  }
+
   async makeNewUser(
     user: Pick<User, 'email' | 'password' | 'firstName' | 'lastName'>,
   ) {
@@ -98,9 +105,17 @@ export class AuthService {
     resetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode'],
   ) {
     const user = await this.usersRepo.findOneByEmail(data.email);
+    const device = await this.devicesRepo.findOneByUserIdAndDeviceId(
+      user,
+      data.deviceId,
+    );
 
     if (!user) {
       throw new Error(ErrorMessage.UserNotExists);
+    }
+
+    if (device) {
+      return device;
     }
 
     const deviceData: Pick<Device, 'deviceId' | 'hashedResetCode' | 'userId'> =
