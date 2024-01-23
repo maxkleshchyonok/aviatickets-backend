@@ -11,7 +11,7 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 
     response.status(500).json({
       statusCode: 500,
-      message: 'Internal server error. Try again later',
+      message: exception.message,
     });
   }
 }

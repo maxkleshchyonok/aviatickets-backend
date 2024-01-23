@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'api/libs/prisma/prisma.service';
 
 @Injectable()
@@ -35,7 +36,10 @@ export class FlightsRepo {
 
         flights.map((flight) => {
           if (flight.availableSeatAmount < 0) {
-            return null;
+            throw new PrismaClientKnownRequestError(
+              `Insufficient seats on flight: ${flight.originCity} - ${flight.destinationCity}`,
+              { code: '500', clientVersion: 'latest' },
+            );
           }
         });
       },
