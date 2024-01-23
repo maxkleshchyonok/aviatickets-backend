@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { GetUsersQueryDto } from 'api/app/users/domain/get-users-query.dto';
-import { PrismaService } from 'api/libs/prisma/prisma.service';
+import { PrismaService } from 'libs/prisma/prisma.service';
 import { UserIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()

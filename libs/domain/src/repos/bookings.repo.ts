@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Booking, Prisma } from '@prisma/client';
 import { GetAllBookingsQueryDto } from 'api/app/bookings/domain/get-all-bookings-query.dto';
 import { GetAllUserBookingsQueryDto } from 'api/app/users/domain/get-all-user-bookings.dto';
-import { PrismaService } from 'api/libs/prisma/prisma.service';
+import { PrismaService } from 'libs/prisma/prisma.service';
 import { UserIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()

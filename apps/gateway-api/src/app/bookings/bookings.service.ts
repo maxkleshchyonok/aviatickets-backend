@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BookingsRepo } from 'api/domain/repos/bookings.repo';
+import { BookingsRepo } from 'libs/domain/src/repos/bookings.repo';
 import { GetAllBookingsQueryDto } from './domain/get-all-bookings-query.dto';
 import { Booking } from '@prisma/client';
 

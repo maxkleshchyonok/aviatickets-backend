@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { BookingsRepo } from 'api/domain/repos/bookings.repo';
-import { UsersRepo } from 'api/domain/repos/users.repo';
+import { BookingsRepo } from 'libs/domain/src/repos/bookings.repo';
+import { UsersRepo } from 'libs/domain/src/repos/users.repo';
 import { UserIdentifier } from 'api/types/model-identifiers.types';
 import { GetAllUserBookingsQueryDto } from './domain/get-all-user-bookings.dto';
 import { GetUsersQueryDto } from './domain/get-users-query.dto';

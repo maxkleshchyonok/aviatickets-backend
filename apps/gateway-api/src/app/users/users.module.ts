@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { BookingsRepo } from 'api/domain/repos/bookings.repo';
-import { UsersRepo } from 'api/domain/repos/users.repo';
-import { PrismaModule } from 'api/libs/prisma/prisma.module';
+import { BookingsRepo } from 'libs/domain/src/repos/bookings.repo';
+import { UsersRepo } from 'libs/domain/src/repos/users.repo';
+import { PrismaModule } from 'libs/prisma/prisma.module';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 

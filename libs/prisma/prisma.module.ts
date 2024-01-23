@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { FlightGraphModule } from '../flight-graph/flight-graph.module';
+import { FlightGraphModule } from '../../apps/gateway-api/src/libs/flight-graph/flight-graph.module';
 import { PrismaService } from './prisma.service';
 
 @Module({
