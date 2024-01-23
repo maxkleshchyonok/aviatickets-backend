@@ -6,15 +6,15 @@ import { PrismaService } from 'libs/prisma/prisma.service';
 export class FlightsRepo {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findManyById(flightId: string) {
-    return await this.prisma.flight.findUnique({
+  async findFlightByIds(flightIds: string[]) {
+    return await this.prisma.flight.findMany({
       where: {
-        id: flightId,
+        id: { in: flightIds },
       },
     });
   }
 
-  async decreaseSeatAmount(flightIds: string[], amount: number) {
+  async decreaseFlightSeatAmount(flightIds: string[], amount: number) {
     await this.prisma.$transaction(
       async (tx) => {
         await tx.flight.updateMany({

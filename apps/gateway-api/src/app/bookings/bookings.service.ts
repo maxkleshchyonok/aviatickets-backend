@@ -6,6 +6,7 @@ import { PassengersRepo } from 'api/domain/repos/passengers.repo';
 import { FlightsRepo } from 'api/domain/repos/flights.repo';
 import { CreateBookingDto } from 'api/domain/dto/create-booking.dto';
 import { BookingIdentifier } from 'api/types/model-identifiers.types';
+import { xorBy } from 'lodash';
 
 @Injectable()
 export class BookingsService {
@@ -17,6 +18,10 @@ export class BookingsService {
 
   async findAllBookings(query: GetAllBookingsQueryDto) {
     return await this.bookingsRepo.findAllBookings(query);
+  }
+
+  async findFlightsByIds(flightIds: string[]) {
+    return await this.flightRepo.findFlightByIds(flightIds);
   }
 
   async findBookingById(booking: BookingIdentifier) {
@@ -34,24 +39,31 @@ export class BookingsService {
     flightIds: string[],
     amount: number,
   ) {
-    return await this.flightRepo.decreaseSeatAmount(flightIds, amount);
+    return await this.flightRepo.decreaseFlightSeatAmount(flightIds, amount);
   }
 
   async createBooking(user: Pick<User, 'id'>, booking: CreateBookingDto) {
     return await this.bookingsRepo.createBooking(user, booking);
   }
 
-  async createNecessaryPassenger(
-    passenger: Pick<Passenger, 'lastName' | 'firstName' | 'passportId'>,
+  async findNonexistentPassengers(
+    passengers: Pick<Passenger, 'lastName' | 'firstName' | 'passportId'>[],
   ) {
-    const exists = await this.passengerRepo.findOneByPassport(passenger);
-    if (!exists) {
-      return await this.passengerRepo.createPassenger(passenger);
-    }
-    return exists;
+    const passengerPassportIds = passengers.map(
+      (passenger) => passenger.passportId,
+    );
+
+    const passengerEntities =
+      await this.passengerRepo.findPassengersByPassportIds(
+        passengerPassportIds,
+      );
+
+    return xorBy(passengers, passengerEntities, 'passportId');
   }
 
-  async findFlight(flight: string) {
-    return await this.flightRepo.findManyById(flight);
+  async createPassengers(
+    passengers: Pick<Passenger, 'lastName' | 'firstName' | 'passportId'>[],
+  ) {
+    return await this.passengerRepo.createPassengers(passengers);
   }
 }

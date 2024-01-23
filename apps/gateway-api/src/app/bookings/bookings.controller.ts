@@ -13,7 +13,7 @@ import { BookingsDto } from 'api/domain/dto/bookings.dto';
 import { JwtPermissionsGuard } from 'libs/security/guards/jwt-permissions.guard';
 import { BookingsService } from './bookings.service';
 import { GetAllBookingsQueryDto } from './domain/get-all-bookings-query.dto';
-import { UpdateBookingForm } from './domain/updateBooking.form';
+import { UpdateBookingForm } from './domain/update-booking.form';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { BookingDto } from 'api/domain/dto/booking.dto';
 import { CreateBookingForm } from './domain/create-booking.form';
@@ -34,61 +34,62 @@ export class BookingsController {
   @Post()
   @UseGuards(JwtPermissionsGuard)
   async createBooking(
-    @Body() body: CreateBookingForm,
+    @Body() form: CreateBookingForm,
     @CurrentUser() user: UserSessionDto,
   ) {
-    body.toDestinationRoute.map(async (flightId) => {
-      const existingFlight = await this.bookingsService.findFlight(flightId);
-      if (!existingFlight) {
-        throw new InternalServerErrorException(
-          ErrorMessage.DestinationFlightDoesNotExist,
-        );
-      }
-    });
+    const toDestinationFlightIds = form.toDestinationRoute;
+    const toOriginFlightIds = form.toOriginRoute;
 
-    body.toOriginRoute.map(async (flightId) => {
-      const existingFlight = await this.bookingsService.findFlight(flightId);
-      if (!existingFlight) {
-        throw new InternalServerErrorException(
-          ErrorMessage.OriginFlightDoesNotExist,
-        );
-      }
-    });
+    const [toDestinationFlights, toOriginFlights] = await Promise.all([
+      this.bookingsService.findFlightsByIds(toDestinationFlightIds),
+      this.bookingsService.findFlightsByIds(toOriginFlightIds),
+    ]);
 
-    body.passengers.map(async (passenger) => {
-      const createdPassenger =
-        await this.bookingsService.createNecessaryPassenger(passenger);
-      if (!createdPassenger) {
-        throw new InternalServerErrorException(
-          ErrorMessage.PassengerCreationFailed,
-        );
-      }
-    });
+    const someToDestinationFlightsNotFound =
+      toDestinationFlightIds.length !== toDestinationFlights.length;
+
+    const someToOriginFlightsNotFound =
+      toOriginFlightIds.length !== toOriginFlights.length;
+
+    if (someToDestinationFlightsNotFound || someToOriginFlightsNotFound) {
+      throw new InternalServerErrorException(ErrorMessage.RecordNotExists);
+    }
+
+    const passengersToCreate =
+      await this.bookingsService.findNonexistentPassengers(form.passengers);
+
+    const createdPassengerEntities =
+      await this.bookingsService.createPassengers(passengersToCreate);
+
+    if (!createdPassengerEntities) {
+      throw new InternalServerErrorException(ErrorMessage.RecordCreationFailed);
+    }
 
     const enoughAvailableSeats =
       await this.bookingsService.decreaseFlightsAvailableSeatsAmount(
-        body.toOriginRoute.concat(body.toDestinationRoute),
-        body.passengers.length,
+        [...toDestinationFlightIds, ...toOriginFlightIds],
+        form.passengers.length,
       );
+
     if (!enoughAvailableSeats) {
       throw new InternalServerErrorException(
         ErrorMessage.NotEnoughAvailableSeats,
       );
     }
 
-    const booking = await this.bookingsService.createBooking(user, body);
-    if (!booking) {
+    const bookingEntity = await this.bookingsService.createBooking(user, form);
+    if (!bookingEntity) {
       throw new InternalServerErrorException(ErrorMessage.RecordCreationFailed);
     }
 
-    return BookingDto.fromEntity(booking);
+    return BookingDto.fromEntity(bookingEntity);
   }
 
   @Put(':bookingId')
   @UseGuards(JwtPermissionsGuard)
   async updateBooking(
     @Param('bookingId') bookingId: string,
-    @Body() body: UpdateBookingForm,
+    @Body() form: UpdateBookingForm,
   ) {
     const booking = { id: bookingId };
     const bookingEntity = await this.bookingsService.findBookingById(booking);
@@ -98,7 +99,7 @@ export class BookingsController {
 
     const updatedBookingEntity = await this.bookingsService.updateBooking(
       booking,
-      body,
+      form,
     );
     if (!updatedBookingEntity) {
       throw new InternalServerErrorException(ErrorMessage.RecordUpdationFailed);

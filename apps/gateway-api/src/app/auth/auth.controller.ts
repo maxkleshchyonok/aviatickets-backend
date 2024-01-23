@@ -79,7 +79,6 @@ export class AuthController {
 
   @Post('change-password')
   @UseGuards(JwtPermissionsGuard)
-  @HttpCode(HttpStatus.OK)
   async changePassword(
     @CurrentUser() user: UserSessionDto,
     @Body() body: ChangePasswordForm,
