@@ -18,9 +18,9 @@ import { AuthService } from 'api/app/auth/auth.service';
 import { SignInForm } from 'api/app/auth/dto/signin.form';
 import { SignUpForm } from 'api/app/auth/dto/signup.form';
 import { ForgotPasswordForm } from 'api/app/auth/dto/forgot-password.form';
-import { VerifyForm } from 'api/app/auth/dto/verify.form';
-import { ResetForm } from 'api/app/auth/dto/reset.form';
-import { ChangePasswordForm } from './dto/change.form';
+import { VerifyResetCodeForm } from 'api/app/auth/dto/verify-reset-code.form';
+import { ResetPasswordForm } from 'api/app/auth/dto/reset-password.form';
+import { ChangePasswordForm } from './dto/change-password.form';
 
 @Controller('auth')
 export class AuthController {
@@ -115,10 +115,10 @@ export class AuthController {
     return resetToken;
   }
 
-  @Post('verify')
+  @Post('verify-reset-code')
   async verifyResetCode(
     @Headers('authorization') token: string,
-    @Body() body: VerifyForm,
+    @Body() body: VerifyResetCodeForm,
   ) {
     return await this.authService.verifyResetCode(body.code, token);
   }
@@ -126,7 +126,7 @@ export class AuthController {
   @Post('reset-password')
   async resetPassword(
     @Headers('authorization') token: string,
-    @Body() body: ResetForm,
+    @Body() body: ResetPasswordForm,
   ) {
     if (body.password !== body.confirmPassword) {
       throw new InternalServerErrorException(ErrorMessage.BadPassword);
