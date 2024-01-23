@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { FlightGraphService } from '../flight-graph/flight-graph.service';
+import { FlightGraphService } from '../../apps/gateway-api/src/libs/flight-graph/flight-graph.service';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {

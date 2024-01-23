@@ -3,7 +3,7 @@ import { Device, Role, RoleTypes, User } from '@prisma/client';
 import { RolesRepo } from 'api/domain/repos/roles.repo';
 import { UsersRepo } from 'api/domain/repos/users.repo';
 import { ErrorMessage } from 'api/enums/error-message.enum';
-import { SecurityService } from 'api/libs/security/security.service';
+import { SecurityService } from 'libs/security/security.service';
 import { MailerService } from 'api/libs/mailer/mailer.service';
 import { UserDeviceRepo } from 'api/domain/repos/user-device.repo';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
