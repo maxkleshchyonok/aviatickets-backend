@@ -17,8 +17,16 @@ export class BookingsRepo {
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
       include: {
-        toOriginRoute: true,
-        toDestinationRoute: true,
+        toOriginRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
+        toDestinationRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
         passengers: true,
         user: true,
       },
@@ -42,8 +50,16 @@ export class BookingsRepo {
       skip: (pageNumber - 1) * pageSize,
       take: pageSize,
       include: {
-        toOriginRoute: true,
-        toDestinationRoute: true,
+        toOriginRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
+        toDestinationRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
         passengers: true,
         user: true,
       },
@@ -64,8 +80,16 @@ export class BookingsRepo {
     return await this.prisma.booking.findUnique({
       where: { id },
       include: {
-        toOriginRoute: true,
-        toDestinationRoute: true,
+        toOriginRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
+        toDestinationRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
         passengers: true,
         user: true,
       },
@@ -78,8 +102,16 @@ export class BookingsRepo {
       where: { id },
       data: { status },
       include: {
-        toOriginRoute: true,
-        toDestinationRoute: true,
+        toOriginRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
+        toDestinationRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
         passengers: true,
         user: true,
       },
@@ -91,7 +123,10 @@ export class BookingsRepo {
       data: {
         ...booking,
         toDestinationRoute: {
-          connect: booking.toDestinationRoute.map((id) => ({ id: id })),
+          connect: booking.toDestinationRoute.map((id) => {
+            console.log(id);
+            return { id: id };
+          }),
         },
         toOriginRoute: {
           connect: booking.toOriginRoute.map((id) => ({ id: id })),
@@ -108,8 +143,16 @@ export class BookingsRepo {
         },
       },
       include: {
-        toDestinationRoute: true,
-        toOriginRoute: true,
+        toOriginRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
+        toDestinationRoute: {
+          orderBy: {
+            departureTime: 'asc',
+          },
+        },
         passengers: true,
         user: true,
       },
