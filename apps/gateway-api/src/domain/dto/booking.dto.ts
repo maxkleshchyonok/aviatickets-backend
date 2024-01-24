@@ -10,15 +10,39 @@ import { UserDto } from './user.dto';
 import { UUIDDto } from './uuid.dto';
 import { FlightDto } from './flight.dto';
 import { PassengerDto } from './passenger.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class BookingDto extends UUIDDto {
+  @ApiProperty({ description: 'booking status', enum: BookingStatuses })
   status: BookingStatuses;
+
+  @ApiProperty({ description: 'booking price' })
   price: number;
+
+  @ApiProperty({ description: 'user who made booking' })
   user: UserDto;
+
+  @ApiProperty({ description: 'origin city', enum: Cities })
   originCity: Cities;
+
+  @ApiProperty({ description: 'destination city', enum: Cities })
   destinationCity: Cities;
+
+  @ApiProperty({ description: 'passengers', isArray: true, type: PassengerDto })
   passengers: PassengerDto[];
+
+  @ApiProperty({
+    description: 'flights that make up a route to a destination city',
+    isArray: true,
+    type: FlightDto,
+  })
   toDestinationRoute: FlightDto[];
+
+  @ApiProperty({
+    description: 'flights that make up a route to an origin city',
+    isArray: true,
+    type: FlightDto,
+  })
   toOriginRoute: FlightDto[];
 
   static fromEntity(

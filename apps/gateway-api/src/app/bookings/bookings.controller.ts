@@ -21,11 +21,27 @@ import { CurrentUser } from 'libs/security/decorators/current-user.decorator';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { RequirePermissions } from 'libs/security/decorators/require-permissions.decorator';
 import { UserPermissions } from '@prisma/client';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { HttpStatus } from '@nestjs/common/enums';
 
+@ApiTags('bookings')
 @Controller('bookings')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get bookings of all users' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Success',
+    type: BookingsDto,
+  })
   @Get()
   @RequirePermissions(UserPermissions.GetAllBookings)
   @UseGuards(JwtPermissionsGuard)
@@ -34,6 +50,14 @@ export class BookingsController {
     return BookingsDto.fromResponse(bookingsWithCount);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a booking' })
+  @ApiBody({ type: CreateBookingForm })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Success',
+    type: BookingDto,
+  })
   @Post()
   @RequirePermissions(UserPermissions.CreateBooking)
   @UseGuards(JwtPermissionsGuard)
@@ -89,6 +113,14 @@ export class BookingsController {
     return BookingDto.fromEntity(bookingEntity);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a booking' })
+  @ApiBody({ type: UpdateBookingForm })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Success',
+    type: BookingDto,
+  })
   @Put(':bookingId')
   @RequirePermissions(UserPermissions.UpdateBooking)
   @UseGuards(JwtPermissionsGuard)

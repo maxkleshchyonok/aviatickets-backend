@@ -1,17 +1,21 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { RemoveExtraSpaces } from 'api/decorators/remove-extra-spaces.decorator';
 import { IsNotEmpty, IsString, validate } from 'class-validator';
 
 export class ChangePasswordForm {
+  @ApiProperty({ description: 'old password' })
   @IsNotEmpty()
   @IsString()
   @RemoveExtraSpaces()
   public oldPassword: string;
 
+  @ApiProperty({ description: 'new password' })
   @IsNotEmpty()
   @IsString()
   @RemoveExtraSpaces()
   public newPassword: string;
 
+  @ApiProperty({ description: 'confirm new password' })
   @IsNotEmpty()
   @IsString()
   @RemoveExtraSpaces()

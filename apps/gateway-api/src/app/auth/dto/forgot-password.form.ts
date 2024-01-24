@@ -1,10 +1,13 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsUUID, validate } from 'class-validator';
 
 export class ForgotPasswordForm {
+  @ApiProperty({ description: 'email' })
   @IsNotEmpty()
   @IsEmail()
   public email: string;
 
+  @ApiProperty({ description: 'device id' })
   @IsNotEmpty()
   @IsUUID()
   public deviceId: string;
