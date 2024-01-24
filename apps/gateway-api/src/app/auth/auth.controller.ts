@@ -17,10 +17,12 @@ import { JwtPermissionsGuard } from 'libs/security/guards/jwt-permissions.guard'
 import { AuthService } from 'api/app/auth/auth.service';
 import { SignInForm } from 'api/app/auth/dto/signin.form';
 import { SignUpForm } from 'api/app/auth/dto/signup.form';
-import { ForgotForm } from 'api/app/auth/dto/forgot.form';
-import { VerifyForm } from 'api/app/auth/dto/verify.form';
-import { ResetForm } from 'api/app/auth/dto/reset.form';
-import { ChangePasswordForm } from './dto/change.form';
+import { ForgotPasswordForm } from 'api/app/auth/dto/forgot-password.form';
+import { VerifyResetCodeForm } from 'api/app/auth/dto/verify-reset-code.form';
+import { ResetPasswordForm } from 'api/app/auth/dto/reset-password.form';
+import { ChangePasswordForm } from './dto/change-password.form';
+import { RequirePermissions } from 'libs/security/decorators/require-permissions.decorator';
+import { UserPermissions } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -28,7 +30,7 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() body: SignUpForm) {
-    const userEntity = await this.authService.findUserByEmail(body.email);
+    const userEntity = await this.authService.findUserByEmail(body);
     if (userEntity) {
       throw new InternalServerErrorException(ErrorMessage.UserAlreadyExists);
     }
@@ -44,7 +46,7 @@ export class AuthController {
 
     const accessToken = await this.authService.authenticate(
       newUserEntity,
-      body.deviceId,
+      body,
     );
 
     return AuthDto.from({
@@ -63,10 +65,7 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserNotExists);
     }
 
-    const accessToken = await this.authService.authenticate(
-      userEntity,
-      body.deviceId,
-    );
+    const accessToken = await this.authService.authenticate(userEntity, body);
 
     return AuthDto.from({
       accessToken,
@@ -74,6 +73,7 @@ export class AuthController {
   }
 
   @Get('signout')
+  @RequirePermissions(UserPermissions.SignOut)
   @UseGuards(JwtPermissionsGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
@@ -81,8 +81,8 @@ export class AuthController {
   }
 
   @Post('change-password')
+  @RequirePermissions(UserPermissions.ChangePassword)
   @UseGuards(JwtPermissionsGuard)
-  @HttpCode(HttpStatus.OK)
   async changePassword(
     @CurrentUser() user: UserSessionDto,
     @Body() body: ChangePasswordForm,
@@ -94,14 +94,35 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  async forgotPassword(@Body() body: ForgotForm) {
-    return await this.authService.forgotPassword(body);
+  async forgotPassword(@Body() body: ForgotPasswordForm) {
+    const userEntity = await this.authService.findUserByEmail(body);
+    if (!userEntity) {
+      throw new InternalServerErrorException(ErrorMessage.UserNotExists);
+    }
+
+    const resetToken = this.authService.generateResetToken(userEntity, body);
+    const resetCode = this.authService.generateResetCode();
+
+    const messageInfo = await this.authService.sendResetCodeToUserByEmail(
+      userEntity,
+      resetCode,
+    );
+
+    if (!messageInfo) {
+      throw new InternalServerErrorException(ErrorMessage.FailedToSendMessage);
+    }
+
+    const hashedResetCode = this.authService.hashResetCode(resetCode);
+
+    await this.authService.createDevice(userEntity, body, hashedResetCode);
+
+    return resetToken;
   }
 
-  @Post('verify')
+  @Post('verify-reset-code')
   async verifyResetCode(
     @Headers('authorization') token: string,
-    @Body() body: VerifyForm,
+    @Body() body: VerifyResetCodeForm,
   ) {
     return await this.authService.verifyResetCode(body.code, token);
   }
@@ -109,7 +130,7 @@ export class AuthController {
   @Post('reset-password')
   async resetPassword(
     @Headers('authorization') token: string,
-    @Body() body: ResetForm,
+    @Body() body: ResetPasswordForm,
   ) {
     if (body.password !== body.confirmPassword) {
       throw new InternalServerErrorException(ErrorMessage.BadPassword);

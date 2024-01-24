@@ -6,6 +6,14 @@ import { PrismaService } from 'libs/prisma/prisma.service';
 export class PassengersRepo {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findPassengersByPassportIds(passportIds: string[]) {
+    return await this.prisma.passenger.findMany({
+      where: {
+        passportId: { in: passportIds },
+      },
+    });
+  }
+
   async findOneByPassport(passenger: Pick<Passenger, 'passportId'>) {
     return await this.prisma.passenger.findUnique({
       where: {
@@ -14,13 +22,11 @@ export class PassengersRepo {
     });
   }
 
-  async createPassenger(
-    passenger: Pick<Passenger, 'lastName' | 'firstName' | 'passportId'>,
+  async createPassengers(
+    passengers: Pick<Passenger, 'lastName' | 'firstName' | 'passportId'>[],
   ) {
-    return await this.prisma.passenger.create({
-      data: {
-        ...passenger,
-      },
+    return await this.prisma.passenger.createMany({
+      data: passengers,
     });
   }
 }

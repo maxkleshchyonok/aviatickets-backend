@@ -11,8 +11,6 @@ export enum ErrorMessage {
   NotExists_User = 'errors.auth.not-exists.user',
   UserWithEmailExists = 'errors.auth.user-already-exists',
   UserCreationFailed = 'errors.auth.user-creation-failed',
-  UserNotVerified = 'errors.auth.user-is-not-verified',
-  UserAlreadyVerified = 'errors.auth.user-already-verified',
   ExitNotExecuted = 'errors.auth.exit-not-executed',
   InvalidDate = 'errors.invalid-date',
   RecordNotFound = 'errors.record.not-found',
@@ -28,8 +26,6 @@ export enum ErrorMessage {
   BadVerification = 'errors.verification-failed',
   NotAuthorizedDevice = 'errors.bad-device',
   BadPassword = 'errors.passwords-dont-match',
-  DestinationFlightDoesNotExist = 'errors.destination-flight-does-not-exist',
-  OriginFlightDoesNotExist = 'errors.origin-flight-does-not-exist',
-  PassengerCreationFailed = 'errors.passenger-creation-failed',
+  FailedToSendMessage='errors.failed-to-send-message',
   NotEnoughAvailableSeats = 'errors.not-enough-available-seats',
 }

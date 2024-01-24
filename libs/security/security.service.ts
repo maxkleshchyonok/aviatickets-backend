@@ -25,9 +25,9 @@ export class SecurityService {
 
   generateAccessToken(
     model: User & { role: Role },
-    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+    device: Pick<Device, 'deviceId'>,
   ) {
-    const payload = UserSessionDto.toPlainObject(model, deviceId);
+    const payload = UserSessionDto.toPlainObject(model, device.deviceId);
     const securityConfig = this.config.get<SecurityConfig>('security');
 
     const { secret: atSecret, signOptions: atSignOptions } =
@@ -42,8 +42,8 @@ export class SecurityService {
   }
 
   generateResetToken(
-    userId: Pick<User, 'id'>['id'],
-    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+    user: Pick<User, 'id'>,
+    device: Pick<Device, 'deviceId'>,
     hashedResetCode: Pick<Device, 'hashedResetCode'>['hashedResetCode'] = null,
   ) {
     const securityConfig = this.config.get<SecurityConfig>('security');
@@ -51,8 +51,8 @@ export class SecurityService {
       securityConfig.resetTokenOptions;
 
     const payload = {
-      deviceId,
-      userId,
+      deviceId: device.deviceId,
+      userId: user.id,
       hashedResetCode,
     };
 
@@ -80,16 +80,14 @@ export class SecurityService {
     }
   }
 
-  generateRandomCode() {
+  generateResetCode(): number {
     const min = 100000;
     const max = 999999;
     const randomResetCode = Math.floor(Math.random() * (max - min + 1)) + min;
-    const hashedCode = this.hashResetCode(randomResetCode);
-
-    return { hashedCode, randomResetCode };
+    return randomResetCode;
   }
 
-  hashResetCode(resetCode: number) {
+  hashResetCode(resetCode: number): string {
     const hash = crypto.createHash('sha256');
     hash.update(resetCode.toString());
     const hashedCode = hash.digest('hex');

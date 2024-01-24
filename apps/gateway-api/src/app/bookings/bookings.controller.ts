@@ -5,6 +5,7 @@ import {
   InternalServerErrorException,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -12,94 +13,103 @@ import { BookingsDto } from 'api/domain/dto/bookings.dto';
 import { JwtPermissionsGuard } from 'libs/security/guards/jwt-permissions.guard';
 import { BookingsService } from './bookings.service';
 import { GetAllBookingsQueryDto } from './domain/get-all-bookings-query.dto';
-import { UpdateBookingForm } from './domain/updateBooking.form';
+import { UpdateBookingForm } from './domain/update-booking.form';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { BookingDto } from 'api/domain/dto/booking.dto';
 import { CreateBookingForm } from './domain/create-booking.form';
 import { CurrentUser } from 'libs/security/decorators/current-user.decorator';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
+import { RequirePermissions } from 'libs/security/decorators/require-permissions.decorator';
+import { UserPermissions } from '@prisma/client';
 
 @Controller('bookings')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Get()
+  @RequirePermissions(UserPermissions.GetAllBookings)
   @UseGuards(JwtPermissionsGuard)
   async getAllBookings(@Query() query: GetAllBookingsQueryDto) {
     const bookingsWithCount = await this.bookingsService.findAllBookings(query);
     return BookingsDto.fromResponse(bookingsWithCount);
   }
 
-  @Post(':id')
-  //@UseGuards(JwtPermissionsGuard)
-  async updateOneBooking(
-    @Param('id') id: string,
-    @Body() body: UpdateBookingForm,
-  ) {
-    const booking = await this.bookingsService.findBookingById(id);
-    if (!booking) {
-      throw new InternalServerErrorException(ErrorMessage.RecordNotFound);
-    }
-    const updatedBooking = await this.bookingsService.updateOneBooking(
-      id,
-      body,
-    );
-    if (!updatedBooking) {
-      throw new InternalServerErrorException(ErrorMessage.RecordUpdationFailed);
-    }
-    return BookingDto.fromEntity(updatedBooking);
-  }
-
   @Post()
+  @RequirePermissions(UserPermissions.CreateBooking)
   @UseGuards(JwtPermissionsGuard)
   async createBooking(
-    @Body() body: CreateBookingForm,
+    @Body() form: CreateBookingForm,
     @CurrentUser() user: UserSessionDto,
   ) {
-    body.toDestinationRoute.map(async (flightId) => {
-      const existingFlight = await this.bookingsService.findFlight(flightId);
-      if (!existingFlight) {
-        throw new InternalServerErrorException(
-          ErrorMessage.DestinationFlightDoesNotExist,
-        );
-      }
-    });
+    const toDestinationFlightIds = form.toDestinationRoute;
+    const toOriginFlightIds = form.toOriginRoute;
 
-    body.toOriginRoute.map(async (flightId) => {
-      const existingFlight = await this.bookingsService.findFlight(flightId);
-      if (!existingFlight) {
-        throw new InternalServerErrorException(
-          ErrorMessage.OriginFlightDoesNotExist,
-        );
-      }
-    });
+    const [toDestinationFlights, toOriginFlights] = await Promise.all([
+      this.bookingsService.findFlightsByIds(toDestinationFlightIds),
+      this.bookingsService.findFlightsByIds(toOriginFlightIds),
+    ]);
 
-    body.passengers.map(async (passenger) => {
-      const createdPassenger =
-        await this.bookingsService.createNecessaryPassenger(passenger);
-      if (!createdPassenger) {
-        throw new InternalServerErrorException(
-          ErrorMessage.PassengerCreationFailed,
-        );
-      }
-    });
+    const someToDestinationFlightsNotFound =
+      toDestinationFlightIds.length !== toDestinationFlights.length;
+
+    const someToOriginFlightsNotFound =
+      toOriginFlightIds.length !== toOriginFlights.length;
+
+    if (someToDestinationFlightsNotFound || someToOriginFlightsNotFound) {
+      throw new InternalServerErrorException(ErrorMessage.RecordNotExists);
+    }
+
+    const passengersToCreate =
+      await this.bookingsService.findNonexistentPassengers(form.passengers);
+
+    const createdPassengerEntities =
+      await this.bookingsService.createPassengers(passengersToCreate);
+
+    if (!createdPassengerEntities) {
+      throw new InternalServerErrorException(ErrorMessage.RecordCreationFailed);
+    }
 
     const enoughAvailableSeats =
       await this.bookingsService.decreaseFlightsAvailableSeatsAmount(
-        body.toOriginRoute.concat(body.toDestinationRoute),
-        body.passengers.length,
+        [...toDestinationFlightIds, ...toOriginFlightIds],
+        form.passengers.length,
       );
+
     if (!enoughAvailableSeats) {
       throw new InternalServerErrorException(
         ErrorMessage.NotEnoughAvailableSeats,
       );
     }
 
-    const booking = await this.bookingsService.createBooking(body, user);
-    if (!booking) {
+    const bookingEntity = await this.bookingsService.createBooking(user, form);
+    if (!bookingEntity) {
       throw new InternalServerErrorException(ErrorMessage.RecordCreationFailed);
     }
 
-    return BookingDto.fromEntity(booking);
+    return BookingDto.fromEntity(bookingEntity);
+  }
+
+  @Put(':bookingId')
+  @RequirePermissions(UserPermissions.UpdateBooking)
+  @UseGuards(JwtPermissionsGuard)
+  async updateBooking(
+    @Param('bookingId') bookingId: string,
+    @Body() form: UpdateBookingForm,
+  ) {
+    const booking = { id: bookingId };
+    const bookingEntity = await this.bookingsService.findBookingById(booking);
+    if (!bookingEntity) {
+      throw new InternalServerErrorException(ErrorMessage.RecordNotFound);
+    }
+
+    const updatedBookingEntity = await this.bookingsService.updateBooking(
+      booking,
+      form,
+    );
+    if (!updatedBookingEntity) {
+      throw new InternalServerErrorException(ErrorMessage.RecordUpdationFailed);
+    }
+
+    return BookingDto.fromEntity(updatedBookingEntity);
   }
 }

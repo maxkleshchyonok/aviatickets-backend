@@ -24,18 +24,18 @@ export class UsersRepo {
     return { count, users };
   }
 
-  async findOneById(id: UserIdentifier) {
+  async findOneById(user: UserIdentifier) {
     return await this.prisma.user.findUnique({
-      where: { id },
+      where: { id: user.id },
       include: {
         devices: true,
       },
     });
   }
 
-  async findOneByEmail(email: Pick<User, 'email'>['email']) {
+  async findOneByEmail(user: Pick<User, 'email'>) {
     return await this.prisma.user.findUnique({
-      where: { email },
+      where: { email: user.email },
       include: {
         devices: true,
       },
@@ -69,12 +69,12 @@ export class UsersRepo {
   }
 
   async updateOne(
-    id: UserIdentifier,
+    userId: UserIdentifier,
     user: Pick<User, 'firstName' | 'lastName'>,
   ) {
     return await this.prisma.user.update({
       data: { ...user },
-      where: { id },
+      where: { id: userId.id },
     });
   }
 

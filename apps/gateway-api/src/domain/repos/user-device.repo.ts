@@ -14,12 +14,12 @@ export class UserDeviceRepo {
 
   async findOneByUserIdAndDeviceId(
     user: Pick<User, 'id'>,
-    deviceId: Pick<Device, 'deviceId'>['deviceId'],
+    device: Pick<Device, 'deviceId'>,
   ) {
     return await this.prisma.device.findUnique({
       where: {
         userId_deviceId: {
-          deviceId,
+          deviceId: device.deviceId,
           userId: user.id,
         },
       },

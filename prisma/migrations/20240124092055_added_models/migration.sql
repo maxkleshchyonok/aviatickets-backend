@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserPermissions" AS ENUM ('permissions.all');
+CREATE TYPE "UserPermissions" AS ENUM ('permissions.all', 'permissions.bookings.get-all-bookings', 'permissions.bookings.create-booking', 'permissions.bookings.update-booking', 'permissions.users.get-all-users', 'permissions.users.get-all-user-bookings', 'permissions.users.get-user', 'permissions.users.update-user', 'permissions.auth.sign-out', 'permissions.auth.change-password');
 
 -- CreateEnum
 CREATE TYPE "RoleTypes" AS ENUM ('admin', 'user', 'sales');
@@ -11,7 +11,7 @@ CREATE TYPE "FlightStatuses" AS ENUM ('planned', 'completed');
 CREATE TYPE "BookingStatuses" AS ENUM ('payed', 'booked', 'cancelled');
 
 -- CreateEnum
-CREATE TYPE "Cities" AS ENUM ('Tirana', 'Algiers', 'Vienna', 'Baku', 'Nassau', 'Manama', 'Dhaka', 'Bridgetown', 'Minsk', 'Brussels', 'Belmopan', 'Gaborone', 'Sofia', 'Moroni', 'Brazzaville', 'Havana', 'Nicosia', 'Prague', 'Copenhagen', 'Cairo', 'Malabo', 'Tallinn', 'Helsinki', 'Paris', 'Libreville', 'Tbilisi', 'Berlin', 'Conakry', 'Bissau', 'Georgetown', 'Budapest', 'Bamako', 'Valletta', 'Monaco', 'Rabat', 'Maputo', 'Amsterdam', 'Wellington', 'Managua', 'Abuja', 'Oslo', 'Muscat', 'Lima', 'Manila', 'Warsaw', 'Lisbon', 'Doha', 'Bucharest', 'Moscow', 'Kigali', 'Basseterre');
+CREATE TYPE "Cities" AS ENUM ('Bridgetown', 'Minsk', 'Brussels', 'Sofia', 'Brazzaville', 'Prague', 'Helsinki', 'Paris', 'Tbilisi', 'Berlin', 'Bissau', 'Valletta', 'Monaco', 'Warsaw', 'Lisbon', 'Bucharest');
 
 -- CreateTable
 CREATE TABLE "roles" (
@@ -133,6 +133,12 @@ CREATE UNIQUE INDEX "devices_user_id_device_id_key" ON "devices"("user_id", "dev
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE INDEX "users_email_password_idx" ON "users"("email", "password");
+
+-- CreateIndex
+CREATE INDEX "bookings_user_id_idx" ON "bookings"("user_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "passengers_passport_id_key" ON "passengers"("passport_id");
