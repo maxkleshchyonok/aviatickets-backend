@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   Headers,
   HttpCode,
   HttpStatus,
@@ -72,7 +71,7 @@ export class AuthController {
     });
   }
 
-  @Get('signout')
+  @Post('signout')
   @RequirePermissions(UserPermissions.SignOut)
   @UseGuards(JwtPermissionsGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
