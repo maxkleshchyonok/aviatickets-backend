@@ -8,6 +8,7 @@ import { MailerService } from 'api/libs/mailer/mailer.service';
 import { UserDeviceRepo } from 'api/domain/repos/user-device.repo';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { UserIdentifier } from 'api/types/model-identifiers.types';
+import { UserResetTokenDto } from 'api/domain/dto/user-reset-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -68,21 +69,18 @@ export class AuthService {
     user: User & { role: Role },
     device: Pick<Device, 'deviceId'>,
   ) {
-    const accessToken = this.securityService.generateAccessToken(user, device);
+    const tokens = this.securityService.generateTokens(user, device);
 
     await this.createDevice(user, device, null);
 
-    return accessToken;
+    return tokens;
   }
 
   async signout(user: UserSessionDto) {
     return await this.devicesRepo.deleteDevice(user.id, user.deviceId);
   }
 
-  async generateResetToken(
-    user: Pick<User, 'id'>,
-    device: Pick<Device, 'deviceId'>,
-  ) {
+  generateResetToken(user: Pick<User, 'id'>, device: Pick<Device, 'deviceId'>) {
     return this.securityService.generateResetToken(user, device);
   }
 
@@ -130,32 +128,27 @@ export class AuthService {
     return await this.devicesRepo.createDevice(deviceData);
   }
 
-  async verifyResetCode(code: number, resetToken: string) {
-    console.log(code, resetToken);
-
-    const { decodedToken } = this.securityService.decodeResetToken(
-      resetToken.split(' ')[1],
-    );
-
-    const user = await this.usersRepo.findOneById(decodedToken.userId);
-
-    const device = await this.devicesRepo.findOneByUserIdAndDeviceId(
+  async verifyUserResetCode(user: UserResetTokenDto, code: number) {
+    const userEntity = await this.usersRepo.findOneById(user);
+    const device = { deviceId: user.deviceId };
+    const deviceEntity = await this.devicesRepo.findOneByUserIdAndDeviceId(
       user,
-      decodedToken.deviceId,
+      device,
     );
 
     const hashedResetCode = this.securityService.hashResetCode(code);
 
-    if (device.hashedResetCode === hashedResetCode) {
-      const resetToken = this.securityService.generateResetToken(
-        user,
-        device,
-        hashedResetCode,
-      );
-      return resetToken;
+    if (deviceEntity.hashedResetCode !== hashedResetCode) {
+      return null;
     }
 
-    return null;
+    const resetToken = this.securityService.generateResetToken(
+      userEntity,
+      deviceEntity,
+      hashedResetCode,
+    );
+
+    return resetToken;
   }
 
   async resetPassword(password: Pick<User, 'password'>, resetToken: string) {
@@ -191,6 +184,38 @@ export class AuthService {
     };
 
     await this.devicesRepo.deleteDevice(user.id, deviceData.deviceId);
+
+    return await this.usersRepo.resetPassword(resetData);
+  }
+
+  async resetUserPassword(
+    user: UserResetTokenDto,
+    userData: Pick<User, 'password'>,
+  ) {
+    const userEntity = await this.usersRepo.findOneById(user);
+
+    const device = userEntity.devices.find(
+      (device) => device.deviceId === user.deviceId,
+    );
+
+    if (user.hashedResetCode !== device.hashedResetCode) {
+      throw new Error(ErrorMessage.BadVerification);
+    }
+
+    if (!device) {
+      throw new Error(ErrorMessage.NotAuthorizedDevice);
+    }
+
+    const hashedPassword = await this.securityService.hashPassword(
+      userData.password,
+    );
+
+    const resetData: Pick<User, 'email' | 'password'> = {
+      email: userEntity.email,
+      password: hashedPassword,
+    };
+
+    await this.devicesRepo.deleteDevice(user.id, device.deviceId);
 
     return await this.usersRepo.resetPassword(resetData);
   }

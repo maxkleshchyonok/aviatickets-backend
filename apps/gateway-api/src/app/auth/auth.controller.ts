@@ -1,7 +1,7 @@
 import {
   Body,
   Controller,
-  Headers,
+  Get,
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
@@ -22,6 +22,9 @@ import { ResetPasswordForm } from 'api/app/auth/dto/reset-password.form';
 import { ChangePasswordForm } from './dto/change-password.form';
 import { RequirePermissions } from 'libs/security/decorators/require-permissions.decorator';
 import { UserPermissions } from '@prisma/client';
+import { RefreshTokenGuard } from 'libs/security/guards/refresh-token.guard';
+import { ResetTokenGuard } from 'libs/security/guards/reset-token.guard';
+import { UserResetTokenDto } from 'api/domain/dto/user-reset-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -43,14 +46,9 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserCreationFailed);
     }
 
-    const accessToken = await this.authService.authenticate(
-      newUserEntity,
-      body,
-    );
+    const tokens = await this.authService.authenticate(newUserEntity, body);
 
-    return AuthDto.from({
-      accessToken,
-    });
+    return AuthDto.from(tokens);
   }
 
   @Post('signin')
@@ -64,11 +62,9 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserNotExists);
     }
 
-    const accessToken = await this.authService.authenticate(userEntity, body);
+    const tokens = await this.authService.authenticate(userEntity, body);
 
-    return AuthDto.from({
-      accessToken,
-    });
+    return AuthDto.from(tokens);
   }
 
   @Post('signout')
@@ -77,6 +73,20 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
     return await this.authService.signout(user);
+  }
+
+  @Get('refresh-tokens')
+  @UseGuards(RefreshTokenGuard)
+  async refreshTokens(@CurrentUser() user: UserSessionDto) {
+    const userEntity = await this.authService.findUserById(user);
+    if (!userEntity) {
+      throw new InternalServerErrorException(ErrorMessage.UserNotExists);
+    }
+
+    const device = { deviceId: user.deviceId };
+    const tokens = await this.authService.authenticate(userEntity, device);
+
+    return AuthDto.from(tokens);
   }
 
   @Post('change-password')
@@ -119,21 +129,23 @@ export class AuthController {
   }
 
   @Post('verify-reset-code')
+  @UseGuards(ResetTokenGuard)
   async verifyResetCode(
-    @Headers('authorization') token: string,
+    @CurrentUser() user: UserResetTokenDto,
     @Body() body: VerifyResetCodeForm,
   ) {
-    return await this.authService.verifyResetCode(body.code, token);
+    return await this.authService.verifyUserResetCode(user, body.code);
   }
 
   @Post('reset-password')
+  @UseGuards(ResetTokenGuard)
   async resetPassword(
-    @Headers('authorization') token: string,
+    @CurrentUser() user: UserResetTokenDto,
     @Body() body: ResetPasswordForm,
   ) {
     if (body.password !== body.confirmPassword) {
       throw new InternalServerErrorException(ErrorMessage.BadPassword);
     }
-    return await this.authService.resetPassword(body, token);
+    return await this.authService.resetUserPassword(user, body);
   }
 }

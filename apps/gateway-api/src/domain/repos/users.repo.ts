@@ -29,6 +29,7 @@ export class UsersRepo {
       where: { id: user.id },
       include: {
         devices: true,
+        role: true,
       },
     });
   }
@@ -38,6 +39,7 @@ export class UsersRepo {
       where: { email: user.email },
       include: {
         devices: true,
+        role: true,
       },
     });
   }
@@ -75,6 +77,7 @@ export class UsersRepo {
     return await this.prisma.user.update({
       data: { ...user },
       where: { id: userId.id },
+      include: { role: true },
     });
   }
 
@@ -84,6 +87,7 @@ export class UsersRepo {
       data: {
         password: resetData.password,
       },
+      include: { role: true },
     });
   }
 
