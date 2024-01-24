@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Booking, RoleTypes, User } from '@prisma/client';
 import { BookingDto } from './booking.dto';
 import { UUIDDto } from './uuid.dto';
@@ -8,7 +9,10 @@ interface BookingsWithCount {
 }
 
 class BookingDataDto {
+  @ApiProperty({ description: 'total number of bookings' })
   count: number;
+
+  @ApiProperty({ description: 'bookings', isArray: true, type: BookingDto })
   bookings: BookingDto[];
 
   static from(bookingsWithCount?: BookingsWithCount) {
@@ -24,11 +28,22 @@ class BookingDataDto {
 }
 
 export class UserDto extends UUIDDto {
+  @ApiProperty({ description: 'user first name' })
   firstName: string;
+
+  @ApiProperty({ description: 'user last name' })
   lastName: string;
+
+  @ApiProperty({ description: 'user email' })
   email: string;
+
+  @ApiProperty({ description: 'role id' })
   roleId: string;
+
+  @ApiProperty({ description: 'role type', enum: RoleTypes })
   roleType: RoleTypes;
+
+  @ApiProperty({ description: 'user bookings with their count' })
   bookingData?: BookingDataDto;
 
   static fromEntity(entity?: User, bookingsWithCount?: BookingsWithCount) {

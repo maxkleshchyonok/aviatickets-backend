@@ -1,16 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
   InternalServerErrorException,
-  ParseUUIDPipe,
-  Query,
-} from '@nestjs/common';
-import { UseGuards } from '@nestjs/common/decorators/core/use-guards.decorator';
-import { Put } from '@nestjs/common/decorators/http/request-mapping.decorator';
-import {
-  Body,
   Param,
-} from '@nestjs/common/decorators/http/route-params.decorator';
+  ParseUUIDPipe,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserPermissions } from '@prisma/client';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { UserDto } from 'api/domain/dto/user.dto';
@@ -24,10 +29,18 @@ import { GetUsersQueryDto } from './domain/get-users-query.dto';
 import { UpdateUserForm } from './domain/update-user.form';
 import { UsersService } from './users.service';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: UserDto,
+  })
   @Get()
   @RequirePermissions(UserPermissions.GetAllUsers)
   @UseGuards(JwtPermissionsGuard)
@@ -36,6 +49,13 @@ export class UsersController {
     return UsersDto.fromResponse(usersWithCount);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all user bookings' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: UserDto,
+  })
   @Get('me/bookings')
   @RequirePermissions(UserPermissions.GetAllUserBookings)
   @UseGuards(JwtPermissionsGuard)
@@ -56,6 +76,13 @@ export class UsersController {
     return UserDto.fromEntity(userEntity, userBookingsWithCount);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get me' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: UserDto,
+  })
   @Get('me')
   @RequirePermissions(UserPermissions.GetUser)
   @UseGuards(JwtPermissionsGuard)
@@ -68,6 +95,14 @@ export class UsersController {
     return UserDto.fromEntity(userEntity);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a user' })
+  @ApiBody({ type: UpdateUserForm })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: UserDto,
+  })
   @Put(':userId')
   @RequirePermissions(UserPermissions.UpdateUser)
   @UseGuards(JwtPermissionsGuard)
