@@ -103,6 +103,7 @@ model User {
   role     Role      @relation(fields: [roleId], references: [id])
   roleId   String    @map("role_id") @db.Uuid
 
+  @@index([email, password])
   @@map("users")
 }
 
@@ -124,6 +125,7 @@ model Booking {
   userId     String      @map("user_id") @db.Uuid
   user       User        @relation(fields: [userId], references: [id])
 
+  @@index([userId])
   @@map("bookings")
 }
 

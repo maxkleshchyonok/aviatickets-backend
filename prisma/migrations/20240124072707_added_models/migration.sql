@@ -135,6 +135,12 @@ CREATE UNIQUE INDEX "devices_user_id_device_id_key" ON "devices"("user_id", "dev
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
+CREATE INDEX "users_email_password_idx" ON "users"("email", "password");
+
+-- CreateIndex
+CREATE INDEX "bookings_user_id_idx" ON "bookings"("user_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "passengers_passport_id_key" ON "passengers"("passport_id");
 
 -- CreateIndex
