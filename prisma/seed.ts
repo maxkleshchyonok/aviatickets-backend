@@ -32,8 +32,8 @@ async function createFlights(quantity: number) {
 
   for (let i = 0; i < quantity; i++) {
     const departureTime = faker.date.soon({
-      days: 60,
-      refDate: '2024-01-15T00:00:00.000Z',
+      days: 10,
+      refDate: '2024-01-24T00:00:00.000Z',
     });
 
     const arrivalTime = new Date(
@@ -160,7 +160,7 @@ async function createDefaultUsers() {
 }
 
 async function main() {
-  await Promise.all([createFlights(400), createRoles(), createDefaultUsers()]);
+  await Promise.all([createFlights(200), createRoles(), createDefaultUsers()]);
 }
 
 main()
