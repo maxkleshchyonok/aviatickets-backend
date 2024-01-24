@@ -188,6 +188,38 @@ export class AuthService {
     return await this.usersRepo.resetPassword(resetData);
   }
 
+  async resetUserPassword(
+    user: UserResetTokenDto,
+    userData: Pick<User, 'password'>,
+  ) {
+    const userEntity = await this.usersRepo.findOneById(user);
+
+    const device = userEntity.devices.find(
+      (device) => device.deviceId === user.deviceId,
+    );
+
+    if (user.hashedResetCode !== device.hashedResetCode) {
+      throw new Error(ErrorMessage.BadVerification);
+    }
+
+    if (!device) {
+      throw new Error(ErrorMessage.NotAuthorizedDevice);
+    }
+
+    const hashedPassword = await this.securityService.hashPassword(
+      userData.password,
+    );
+
+    const resetData: Pick<User, 'email' | 'password'> = {
+      email: userEntity.email,
+      password: hashedPassword,
+    };
+
+    await this.devicesRepo.deleteDevice(user.id, device.deviceId);
+
+    return await this.usersRepo.resetPassword(resetData);
+  }
+
   async changePassword(
     userData: UserSessionDto,
     changeData: {

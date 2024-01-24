@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
@@ -139,13 +138,14 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @UseGuards(ResetTokenGuard)
   async resetPassword(
-    @Headers('authorization') token: string,
+    @CurrentUser() user: UserResetTokenDto,
     @Body() body: ResetPasswordForm,
   ) {
     if (body.password !== body.confirmPassword) {
       throw new InternalServerErrorException(ErrorMessage.BadPassword);
     }
-    return await this.authService.resetPassword(body, token);
+    return await this.authService.resetUserPassword(user, body);
   }
 }
