@@ -39,7 +39,7 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Success',
-    type: UserDto,
+    type: UsersDto,
   })
   @Get()
   @RequirePermissions(UserPermissions.GetAllUsers)
