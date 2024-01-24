@@ -154,25 +154,8 @@ model Flight {
   seatAmount          Int            @map("seat_amount")
   availableSeatAmount Int            @map("available_seat_amount")
 
-  plane   Plane?  @relation(fields: [planeId], references: [id])
-  planeId String? @map("plane_id") @db.Uuid
-
   toOriginBookings      Booking[] @relation("booking_to_flight_destination")
   toDestinationBookings Booking[] @relation("booking_to_flight_origin")
 
   @@map("flights")
-}
-
-model Plane {
-  id        String   @id @default(uuid()) @db.Uuid
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  name     String
-  capacity Int
-  carrier  String
-
-  flights Flight[]
-
-  @@map("planes")
 }

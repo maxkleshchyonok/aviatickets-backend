@@ -13,7 +13,7 @@ import * as crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
-type SeedFlight = Omit<Flight, 'id' | 'createdAt' | 'updatedAt' | 'planeId'>;
+type SeedFlight = Omit<Flight, 'id' | 'createdAt' | 'updatedAt'>;
 
 function getRandomInt(leftBoundary: number, rightBoundary: number): number {
   const min = Math.ceil(leftBoundary);

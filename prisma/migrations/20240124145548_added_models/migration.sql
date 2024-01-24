@@ -90,21 +90,8 @@ CREATE TABLE "flights" (
     "price" INTEGER NOT NULL,
     "seat_amount" INTEGER NOT NULL,
     "available_seat_amount" INTEGER NOT NULL,
-    "plane_id" UUID,
 
     CONSTRAINT "flights_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "planes" (
-    "id" UUID NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-    "name" TEXT NOT NULL,
-    "capacity" INTEGER NOT NULL,
-    "carrier" TEXT NOT NULL,
-
-    CONSTRAINT "planes_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -169,9 +156,6 @@ ALTER TABLE "users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KEY ("role_id") 
 
 -- AddForeignKey
 ALTER TABLE "bookings" ADD CONSTRAINT "bookings_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "flights" ADD CONSTRAINT "flights_plane_id_fkey" FOREIGN KEY ("plane_id") REFERENCES "planes"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_booking_to_flight_destination" ADD CONSTRAINT "_booking_to_flight_destination_A_fkey" FOREIGN KEY ("A") REFERENCES "bookings"("id") ON DELETE CASCADE ON UPDATE CASCADE;
