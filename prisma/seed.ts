@@ -88,6 +88,7 @@ async function createRoles() {
     permissions: [
       UserPermissions.GetAllBookings,
       UserPermissions.UpdateBooking,
+      UserPermissions.GetAllUsers,
       UserPermissions.GetUser,
       UserPermissions.UpdateUser,
       UserPermissions.SignOut,
@@ -98,7 +99,6 @@ async function createRoles() {
   const salesRole: SeedRole = {
     type: RoleTypes.Sales,
     permissions: [
-      UserPermissions.GetAllUsers,
       UserPermissions.GetUser,
       UserPermissions.SignOut,
       UserPermissions.ChangePassword,
