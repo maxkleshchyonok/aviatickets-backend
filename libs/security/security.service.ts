@@ -23,7 +23,7 @@ export class SecurityService {
     return (await this.hashPassword(plainPassword)) === hashedPassword;
   }
 
-  generateAccessToken(
+  generateTokens(
     model: User & { role: Role },
     device: Pick<Device, 'deviceId'>,
   ) {
@@ -32,13 +32,20 @@ export class SecurityService {
 
     const { secret: atSecret, signOptions: atSignOptions } =
       securityConfig.accessTokenOptions;
+    const { secret: rtSecret, signOptions: rtSignOptions } =
+      securityConfig.refreshTokenOptions;
 
     const accessToken = this.jwtService.sign(payload, {
       secret: atSecret,
       ...atSignOptions,
     });
 
-    return accessToken;
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: rtSecret,
+      ...rtSignOptions,
+    });
+
+    return { accessToken, refreshToken };
   }
 
   generateResetToken(

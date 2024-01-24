@@ -43,13 +43,10 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserCreationFailed);
     }
 
-    const accessToken = await this.authService.authenticate(
-      newUserEntity,
-      body,
-    );
+    const tokens = await this.authService.authenticate(newUserEntity, body);
 
     return AuthDto.from({
-      accessToken,
+      ...tokens,
     });
   }
 
@@ -64,10 +61,10 @@ export class AuthController {
       throw new InternalServerErrorException(ErrorMessage.UserNotExists);
     }
 
-    const accessToken = await this.authService.authenticate(userEntity, body);
+    const tokens = await this.authService.authenticate(userEntity, body);
 
     return AuthDto.from({
-      accessToken,
+      ...tokens,
     });
   }
 

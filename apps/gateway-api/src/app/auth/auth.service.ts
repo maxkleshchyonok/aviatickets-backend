@@ -68,11 +68,11 @@ export class AuthService {
     user: User & { role: Role },
     device: Pick<Device, 'deviceId'>,
   ) {
-    const accessToken = this.securityService.generateAccessToken(user, device);
+    const tokens = this.securityService.generateTokens(user, device);
 
     await this.createDevice(user, device, null);
 
-    return accessToken;
+    return tokens;
   }
 
   async signout(user: UserSessionDto) {
