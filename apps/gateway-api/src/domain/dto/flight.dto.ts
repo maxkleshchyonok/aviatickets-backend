@@ -1,15 +1,33 @@
 import { Cities, Flight, FlightStatuses } from '@prisma/client';
 import { UUIDDto } from './uuid.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class FlightDto extends UUIDDto {
+  @ApiProperty({ description: 'origin city', enum: Cities })
   originCity: Cities;
+
+  @ApiProperty({ description: 'destination city', enum: Cities })
   destinationCity: Cities;
+
+  @ApiProperty({ description: 'flight departure time' })
   departureTime: number;
+
+  @ApiProperty({ description: 'flight arrival time' })
   arrivalTime: number;
+
+  @ApiProperty({ description: 'flight time' })
   flightTime: number;
+
+  @ApiProperty({ description: 'flight statuses', enum: FlightStatuses })
   status: FlightStatuses;
+
+  @ApiProperty({ description: 'flight price' })
   price: number;
+
+  @ApiProperty({ description: 'total amount of seats on a flight' })
   seatAmount: number;
+
+  @ApiProperty({ description: 'amount of remaining seats on a flight' })
   availableSeatAmount: number;
 
   static fromEntity(entity?: Flight) {

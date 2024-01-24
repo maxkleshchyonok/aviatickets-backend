@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { UserDto } from './user.dto';
 
@@ -7,8 +8,13 @@ interface Tokens {
 }
 
 export class AuthDto {
+  @ApiProperty({ description: 'access token' })
   accessToken: string;
+
+  @ApiProperty({ description: 'refresh token' })
   refreshToken: string;
+
+  @ApiProperty({ description: 'user' })
   user: UserDto;
 
   static from(data: Tokens & { user: User }) {

@@ -10,6 +10,8 @@ import {
   Max,
   Min,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger/dist';
 
 export enum PassengerAmount {
   Min = 1,
@@ -17,14 +19,17 @@ export enum PassengerAmount {
 }
 
 export class GetTicketsQueryDto extends PaginationQueryDto {
+  @ApiProperty({ description: 'origin city', enum: Cities })
   @IsEnum(Cities)
   @RemoveExtraSpaces()
   originCity: Cities;
 
+  @ApiProperty({ description: 'destination city', enum: Cities })
   @IsEnum(Cities)
   @RemoveExtraSpaces()
   destinationCity: Cities;
 
+  @ApiProperty({ description: 'departure time' })
   @IsNotEmpty()
   @Transform(({ value }) => new Date(value))
   @IsDate()
@@ -32,6 +37,7 @@ export class GetTicketsQueryDto extends PaginationQueryDto {
   @RemoveExtraSpaces()
   departureTime: Date;
 
+  @ApiPropertyOptional({ description: 'arrival time' })
   @IsOptional()
   @Transform(({ value }) => value && new Date(value))
   @IsDate()
@@ -39,6 +45,7 @@ export class GetTicketsQueryDto extends PaginationQueryDto {
   @RemoveExtraSpaces()
   arrivalTime?: Date;
 
+  @ApiProperty({ description: 'passenger amount' })
   @Max(PassengerAmount.Max)
   @Min(PassengerAmount.Min)
   @Transform(({ value }) => Number(value))

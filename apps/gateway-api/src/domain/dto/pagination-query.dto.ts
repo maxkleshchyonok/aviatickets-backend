@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-duplicate-enum-values */
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNumber, Max, Min } from 'class-validator';
 
@@ -14,12 +15,14 @@ enum PageNumber {
 }
 
 export class PaginationQueryDto {
+  @ApiPropertyOptional({ description: 'page size' })
   @Max(PageSize.Max)
   @Min(PageSize.Min)
   @Type(() => Number)
   @IsNumber()
   pageSize: number = PageSize.Default;
 
+  @ApiPropertyOptional({ description: 'page number' })
   @Min(PageNumber.Min)
   @Type(() => Number)
   @IsNumber()

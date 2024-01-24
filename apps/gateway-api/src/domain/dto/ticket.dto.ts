@@ -1,10 +1,18 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { v4 } from 'uuid';
 import { RouteDto } from './route.dto';
 
 export class TicketDto {
+  @ApiProperty({ description: 'id' })
   id: string;
+
+  @ApiProperty({ description: 'ticket price' })
   price: number;
+
+  @ApiProperty({ description: 'route to a destination city', type: RouteDto })
   toDestinationRoute: RouteDto;
+
+  @ApiProperty({ description: 'route to an origin city', nullable: true })
   toOriginRoute: RouteDto | null;
 
   static toTicket(

@@ -1,15 +1,31 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Cities } from '@prisma/client';
 import { Route } from 'api/types/route.type';
 import { FlightDto } from './flight.dto';
 
 export class RouteDto {
+  @ApiProperty({ description: 'route origin city', enum: Cities })
   originCity: Cities;
+
+  @ApiProperty({ description: 'route destination city', enum: Cities })
   destinationCity: Cities;
+
+  @ApiProperty({ description: 'route travel time' })
   travelTime: number;
+
+  @ApiProperty({ description: 'total price of all flights on a route' })
   price: number;
+
+  @ApiProperty({ description: 'route stop amount' })
   stops: number;
+
+  @ApiProperty({ description: 'route arrival time' })
   arrivalTime: number;
+
+  @ApiProperty({ description: 'route departure time' })
   departureTime: number;
+
+  @ApiProperty({ description: 'flights', isArray: true, type: FlightDto })
   flights: FlightDto[];
 
   static fromRoute(route?: Route) {
