@@ -19,12 +19,15 @@ import { BookingDto } from 'api/domain/dto/booking.dto';
 import { CreateBookingForm } from './domain/create-booking.form';
 import { CurrentUser } from 'libs/security/decorators/current-user.decorator';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
+import { RequirePermissions } from 'libs/security/decorators/require-permissions.decorator';
+import { UserPermissions } from '@prisma/client';
 
 @Controller('bookings')
 export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Get()
+  @RequirePermissions(UserPermissions.GetAllBookings)
   @UseGuards(JwtPermissionsGuard)
   async getAllBookings(@Query() query: GetAllBookingsQueryDto) {
     const bookingsWithCount = await this.bookingsService.findAllBookings(query);
@@ -32,6 +35,7 @@ export class BookingsController {
   }
 
   @Post()
+  @RequirePermissions(UserPermissions.CreateBooking)
   @UseGuards(JwtPermissionsGuard)
   async createBooking(
     @Body() form: CreateBookingForm,
@@ -86,6 +90,7 @@ export class BookingsController {
   }
 
   @Put(':bookingId')
+  @RequirePermissions(UserPermissions.UpdateBooking)
   @UseGuards(JwtPermissionsGuard)
   async updateBooking(
     @Param('bookingId') bookingId: string,

@@ -11,11 +11,13 @@ import {
   Body,
   Param,
 } from '@nestjs/common/decorators/http/route-params.decorator';
+import { UserPermissions } from '@prisma/client';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { UserDto } from 'api/domain/dto/user.dto';
 import { UsersDto } from 'api/domain/dto/users.dto';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import { CurrentUser } from 'libs/security/decorators/current-user.decorator';
+import { RequirePermissions } from 'libs/security/decorators/require-permissions.decorator';
 import { JwtPermissionsGuard } from 'libs/security/guards/jwt-permissions.guard';
 import { GetAllUserBookingsQueryDto } from './domain/get-all-user-bookings.dto';
 import { GetUsersQueryDto } from './domain/get-users-query.dto';
@@ -27,6 +29,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @RequirePermissions(UserPermissions.GetAllUsers)
   @UseGuards(JwtPermissionsGuard)
   async getAllUsers(@Query() query: GetUsersQueryDto) {
     const usersWithCount = await this.usersService.findAllUsers(query);
@@ -34,6 +37,7 @@ export class UsersController {
   }
 
   @Get('me/bookings')
+  @RequirePermissions(UserPermissions.GetAllUserBookings)
   @UseGuards(JwtPermissionsGuard)
   async getAllUserBookings(
     @CurrentUser() user: UserSessionDto,
@@ -53,6 +57,7 @@ export class UsersController {
   }
 
   @Get('me')
+  @RequirePermissions(UserPermissions.GetUser)
   @UseGuards(JwtPermissionsGuard)
   async getUser(@CurrentUser() user: UserSessionDto) {
     const userEntity = await this.usersService.findUserById(user);
@@ -64,6 +69,7 @@ export class UsersController {
   }
 
   @Put(':userId')
+  @RequirePermissions(UserPermissions.UpdateUser)
   @UseGuards(JwtPermissionsGuard)
   async updateUser(
     @Param('userId', ParseUUIDPipe) userId: string,

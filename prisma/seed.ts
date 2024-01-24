@@ -67,17 +67,45 @@ type SeedRole = Pick<Role, 'permissions' | 'type'>;
 async function createRoles() {
   const userRole: SeedRole = {
     type: RoleTypes.User,
-    permissions: [UserPermissions.All],
+    permissions: [
+      UserPermissions.CreateBooking,
+      UserPermissions.UpdateBooking,
+      UserPermissions.GetAllUserBookings,
+      UserPermissions.GetUser,
+      UserPermissions.SignOut,
+      UserPermissions.ChangePassword,
+      UserPermissions.VerifyResetCode,
+      UserPermissions.ResetPassword,
+      UserPermissions.RefreshTokens,
+    ],
   };
 
   const adminRole: SeedRole = {
     type: RoleTypes.Admin,
-    permissions: [UserPermissions.All],
+    permissions: [
+      UserPermissions.GetAllBookings,
+      UserPermissions.UpdateBooking,
+      UserPermissions.GetUser,
+      UserPermissions.UpdateUser,
+      UserPermissions.SignOut,
+      UserPermissions.ChangePassword,
+      UserPermissions.VerifyResetCode,
+      UserPermissions.ResetPassword,
+      UserPermissions.RefreshTokens,
+    ],
   };
 
   const salesRole: SeedRole = {
     type: RoleTypes.Sales,
-    permissions: [UserPermissions.All],
+    permissions: [
+      UserPermissions.GetAllUsers,
+      UserPermissions.GetUser,
+      UserPermissions.SignOut,
+      UserPermissions.ChangePassword,
+      UserPermissions.VerifyResetCode,
+      UserPermissions.ResetPassword,
+      UserPermissions.RefreshTokens,
+    ],
   };
 
   const roles = [userRole, adminRole, salesRole];

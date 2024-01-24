@@ -21,6 +21,8 @@ import { ForgotPasswordForm } from 'api/app/auth/dto/forgot-password.form';
 import { VerifyResetCodeForm } from 'api/app/auth/dto/verify-reset-code.form';
 import { ResetPasswordForm } from 'api/app/auth/dto/reset-password.form';
 import { ChangePasswordForm } from './dto/change-password.form';
+import { RequirePermissions } from 'libs/security/decorators/require-permissions.decorator';
+import { UserPermissions } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -71,6 +73,7 @@ export class AuthController {
   }
 
   @Get('signout')
+  @RequirePermissions(UserPermissions.SignOut)
   @UseGuards(JwtPermissionsGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
@@ -78,6 +81,7 @@ export class AuthController {
   }
 
   @Post('change-password')
+  @RequirePermissions(UserPermissions.ChangePassword)
   @UseGuards(JwtPermissionsGuard)
   async changePassword(
     @CurrentUser() user: UserSessionDto,
@@ -116,6 +120,7 @@ export class AuthController {
   }
 
   @Post('verify-reset-code')
+  @RequirePermissions(UserPermissions.VerifyResetCode)
   async verifyResetCode(
     @Headers('authorization') token: string,
     @Body() body: VerifyResetCodeForm,
@@ -124,6 +129,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @RequirePermissions(UserPermissions.ResetPassword)
   async resetPassword(
     @Headers('authorization') token: string,
     @Body() body: ResetPasswordForm,
