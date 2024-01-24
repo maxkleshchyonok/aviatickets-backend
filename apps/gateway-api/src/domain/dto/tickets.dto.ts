@@ -1,10 +1,14 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { JourneyTypes } from 'api/enums/journey-types.enum';
 import { PaginationQueryDto } from './pagination-query.dto';
 import { RouteDto } from './route.dto';
 import { TicketDto } from './ticket.dto';
 
 export class TicketsDto {
+  @ApiProperty({ description: 'total number of tickets' })
   count: number;
+
+  @ApiProperty({ description: 'bookings', isArray: true, type: TicketDto })
   tickets: TicketDto[];
 
   static fromRoutes(
