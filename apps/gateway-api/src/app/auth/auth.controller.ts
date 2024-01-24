@@ -48,7 +48,7 @@ export class AuthController {
 
     const tokens = await this.authService.authenticate(newUserEntity, body);
 
-    return AuthDto.from(tokens);
+    return AuthDto.from({ ...tokens, user: newUserEntity });
   }
 
   @Post('signin')
@@ -64,7 +64,7 @@ export class AuthController {
 
     const tokens = await this.authService.authenticate(userEntity, body);
 
-    return AuthDto.from(tokens);
+    return AuthDto.from({ ...tokens, user: userEntity });
   }
 
   @Post('signout')
@@ -86,7 +86,7 @@ export class AuthController {
     const device = { deviceId: user.deviceId };
     const tokens = await this.authService.authenticate(userEntity, device);
 
-    return AuthDto.from(tokens);
+    return AuthDto.from({ ...tokens, user: userEntity });
   }
 
   @Post('change-password')
