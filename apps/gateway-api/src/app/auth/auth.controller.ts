@@ -24,6 +24,8 @@ import { ChangePasswordForm } from './dto/change-password.form';
 import { RequirePermissions } from 'libs/security/decorators/require-permissions.decorator';
 import { UserPermissions } from '@prisma/client';
 import { RefreshTokenGuard } from 'libs/security/guards/refresh-token.guard';
+import { ResetTokenGuard } from 'libs/security/guards/reset-token.guard';
+import { UserResetTokenDto } from 'api/domain/dto/user-reset-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -128,11 +130,12 @@ export class AuthController {
   }
 
   @Post('verify-reset-code')
+  @UseGuards(ResetTokenGuard)
   async verifyResetCode(
-    @Headers('authorization') token: string,
+    @CurrentUser() user: UserResetTokenDto,
     @Body() body: VerifyResetCodeForm,
   ) {
-    return await this.authService.verifyResetCode(body.code, token);
+    return await this.authService.verifyUserResetCode(user, body.code);
   }
 
   @Post('reset-password')

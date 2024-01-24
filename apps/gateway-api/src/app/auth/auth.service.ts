@@ -8,6 +8,7 @@ import { MailerService } from 'api/libs/mailer/mailer.service';
 import { UserDeviceRepo } from 'api/domain/repos/user-device.repo';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { UserIdentifier } from 'api/types/model-identifiers.types';
+import { UserResetTokenDto } from 'api/domain/dto/user-reset-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -79,10 +80,7 @@ export class AuthService {
     return await this.devicesRepo.deleteDevice(user.id, user.deviceId);
   }
 
-  async generateResetToken(
-    user: Pick<User, 'id'>,
-    device: Pick<Device, 'deviceId'>,
-  ) {
+  generateResetToken(user: Pick<User, 'id'>, device: Pick<Device, 'deviceId'>) {
     return this.securityService.generateResetToken(user, device);
   }
 
@@ -130,32 +128,27 @@ export class AuthService {
     return await this.devicesRepo.createDevice(deviceData);
   }
 
-  async verifyResetCode(code: number, resetToken: string) {
-    console.log(code, resetToken);
-
-    const { decodedToken } = this.securityService.decodeResetToken(
-      resetToken.split(' ')[1],
-    );
-
-    const user = await this.usersRepo.findOneById(decodedToken.userId);
-
-    const device = await this.devicesRepo.findOneByUserIdAndDeviceId(
+  async verifyUserResetCode(user: UserResetTokenDto, code: number) {
+    const userEntity = await this.usersRepo.findOneById(user);
+    const device = { deviceId: user.deviceId };
+    const deviceEntity = await this.devicesRepo.findOneByUserIdAndDeviceId(
       user,
-      decodedToken.deviceId,
+      device,
     );
 
     const hashedResetCode = this.securityService.hashResetCode(code);
 
-    if (device.hashedResetCode === hashedResetCode) {
-      const resetToken = this.securityService.generateResetToken(
-        user,
-        device,
-        hashedResetCode,
-      );
-      return resetToken;
+    if (deviceEntity.hashedResetCode !== hashedResetCode) {
+      return null;
     }
 
-    return null;
+    const resetToken = this.securityService.generateResetToken(
+      userEntity,
+      deviceEntity,
+      hashedResetCode,
+    );
+
+    return resetToken;
   }
 
   async resetPassword(password: Pick<User, 'password'>, resetToken: string) {
