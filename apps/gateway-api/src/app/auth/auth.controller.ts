@@ -109,7 +109,7 @@ export class AuthController {
     );
 
     if (!messageInfo) {
-      throw new InternalServerErrorException('Failed to send message');
+      throw new InternalServerErrorException(ErrorMessage.FailedToSendMessage);
     }
 
     const hashedResetCode = this.authService.hashResetCode(resetCode);
