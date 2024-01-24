@@ -11,7 +11,7 @@ CREATE TYPE "FlightStatuses" AS ENUM ('planned', 'completed');
 CREATE TYPE "BookingStatuses" AS ENUM ('payed', 'booked', 'cancelled');
 
 -- CreateEnum
-CREATE TYPE "Cities" AS ENUM ('Tirana', 'Algiers', 'Vienna', 'Baku', 'Nassau', 'Manama', 'Dhaka', 'Bridgetown', 'Minsk', 'Brussels', 'Belmopan', 'Gaborone', 'Sofia', 'Moroni', 'Brazzaville', 'Havana', 'Nicosia', 'Prague', 'Copenhagen', 'Cairo', 'Malabo', 'Tallinn', 'Helsinki', 'Paris', 'Libreville', 'Tbilisi', 'Berlin', 'Conakry', 'Bissau', 'Georgetown', 'Budapest', 'Bamako', 'Valletta', 'Monaco', 'Rabat', 'Maputo', 'Amsterdam', 'Wellington', 'Managua', 'Abuja', 'Oslo', 'Muscat', 'Lima', 'Manila', 'Warsaw', 'Lisbon', 'Doha', 'Bucharest', 'Moscow', 'Kigali', 'Basseterre');
+CREATE TYPE "Cities" AS ENUM ('Bridgetown', 'Minsk', 'Brussels', 'Sofia', 'Brazzaville', 'Prague', 'Helsinki', 'Paris', 'Tbilisi', 'Berlin', 'Bissau', 'Valletta', 'Monaco', 'Warsaw', 'Lisbon', 'Bucharest');
 
 -- CreateTable
 CREATE TABLE "roles" (
