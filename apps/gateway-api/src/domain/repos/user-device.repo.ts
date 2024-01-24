@@ -29,7 +29,6 @@ export class UserDeviceRepo {
   async createDevice(
     data: Pick<Device, 'deviceId' | 'hashedResetCode' | 'userId'>,
   ) {
-    console.log(data);
     return await this.prisma.device.create({
       data: {
         deviceId: data.deviceId,

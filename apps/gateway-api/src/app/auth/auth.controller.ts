@@ -165,7 +165,6 @@ export class AuthController {
 
     const resetToken = this.authService.generateResetToken(userEntity, body);
     const resetCode = this.authService.generateResetCode();
-    console.log(resetCode);
 
     const messageInfo = await this.authService.sendResetCodeToUserByEmail(
       userEntity,
@@ -177,7 +176,6 @@ export class AuthController {
     }
 
     const hashedResetCode = this.authService.hashResetCode(resetCode);
-    console.log(hashedResetCode);
 
     await this.authService.createDevice(userEntity, body, hashedResetCode);
 
