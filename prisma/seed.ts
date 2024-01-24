@@ -80,9 +80,6 @@ async function createRoles() {
       UserPermissions.GetUser,
       UserPermissions.SignOut,
       UserPermissions.ChangePassword,
-      UserPermissions.VerifyResetCode,
-      UserPermissions.ResetPassword,
-      UserPermissions.RefreshTokens,
     ],
   };
 
@@ -95,9 +92,6 @@ async function createRoles() {
       UserPermissions.UpdateUser,
       UserPermissions.SignOut,
       UserPermissions.ChangePassword,
-      UserPermissions.VerifyResetCode,
-      UserPermissions.ResetPassword,
-      UserPermissions.RefreshTokens,
     ],
   };
 
@@ -108,9 +102,6 @@ async function createRoles() {
       UserPermissions.GetUser,
       UserPermissions.SignOut,
       UserPermissions.ChangePassword,
-      UserPermissions.VerifyResetCode,
-      UserPermissions.ResetPassword,
-      UserPermissions.RefreshTokens,
     ],
   };
 

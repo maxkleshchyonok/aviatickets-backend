@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserPermissions" AS ENUM ('permissions.all', 'permissions.bookings.get-all-bookings', 'permissions.bookings.create-booking', 'permissions.bookings.update-booking', 'permissions.users.get-all-users', 'permissions.users.get-all-user-bookings', 'permissions.users.get-user', 'permissions.users.update-user', 'permissions.auth.sign-out', 'permissions.auth.change-password', 'permissions.auth.verify-reset-code', 'permissions.auth.reset-password', 'permissions.auth.refresh-tokens');
+CREATE TYPE "UserPermissions" AS ENUM ('permissions.all', 'permissions.bookings.get-all-bookings', 'permissions.bookings.create-booking', 'permissions.bookings.update-booking', 'permissions.users.get-all-users', 'permissions.users.get-all-user-bookings', 'permissions.users.get-user', 'permissions.users.update-user', 'permissions.auth.sign-out', 'permissions.auth.change-password');
 
 -- CreateEnum
 CREATE TYPE "RoleTypes" AS ENUM ('admin', 'user', 'sales');

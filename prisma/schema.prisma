@@ -18,9 +18,6 @@ enum UserPermissions {
   UpdateUser         @map("permissions.users.update-user")
   SignOut            @map("permissions.auth.sign-out")
   ChangePassword     @map("permissions.auth.change-password")
-  VerifyResetCode    @map("permissions.auth.verify-reset-code")
-  ResetPassword      @map("permissions.auth.reset-password")
-  RefreshTokens      @map("permissions.auth.refresh-tokens")
 }
 
 enum RoleTypes {
