@@ -1,6 +1,8 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, validate } from 'class-validator';
 
 export class VerifyResetCodeForm {
+  @ApiProperty({ description: 'reset code' })
   @IsNumber()
   public code: number;
 

@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Booking, RoleTypes, User } from '@prisma/client';
 import { BookingDto } from './booking.dto';
 import { UUIDDto } from './uuid.dto';
@@ -43,7 +43,7 @@ export class UserDto extends UUIDDto {
   @ApiProperty({ description: 'role type', enum: RoleTypes })
   roleType: RoleTypes;
 
-  @ApiProperty({ description: 'user bookings with their count' })
+  @ApiPropertyOptional({ description: 'user bookings with their count' })
   bookingData?: BookingDataDto;
 
   static fromEntity(entity?: User, bookingsWithCount?: BookingsWithCount) {
