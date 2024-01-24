@@ -7,8 +7,9 @@ import {
   Role,
   RoleTypes,
   UserPermissions,
+  User,
 } from '@prisma/client';
-import { randomInt } from 'crypto';
+import * as crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,11 @@ function getRandomInt(leftBoundary: number, rightBoundary: number): number {
   const min = Math.ceil(leftBoundary);
   const max = Math.floor(rightBoundary);
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+async function hashPassword(password: string) {
+  const hash = crypto.createHash('MD5');
+  return hash.update(password).digest('hex');
 }
 
 async function createFlights(quantity: number) {
@@ -31,7 +37,7 @@ async function createFlights(quantity: number) {
     });
 
     const arrivalTime = new Date(
-      departureTime.getTime() + randomInt(1, 15) * 60 * 60 * 1000,
+      departureTime.getTime() + crypto.randomInt(1, 15) * 60 * 60 * 1000,
     );
 
     const originCityIndex = getRandomInt(0, cities.length - 1);
@@ -113,8 +119,48 @@ async function createRoles() {
   return prisma.role.createMany({ data: roles });
 }
 
+type SeedUser = Pick<
+  User,
+  'firstName' | 'lastName' | 'email' | 'password' | 'roleId' | 'roleType'
+>;
+async function createDefaultUsers() {
+  const [adminRole, salesRole] = await Promise.all([
+    prisma.role.findFirst({ where: { type: RoleTypes.Admin } }),
+    prisma.role.findFirst({ where: { type: RoleTypes.Sales } }),
+  ]);
+
+  const admin: SeedUser = {
+    firstName: 'Andrew',
+    lastName: 'Dollar',
+    email: 'andrew.admin@gmail.com',
+    password: await hashPassword('wsssA+f2'),
+    roleType: RoleTypes.Admin,
+    roleId: adminRole.id,
+  };
+  const sales1: SeedUser = {
+    firstName: 'Mary',
+    lastName: 'Gonzales',
+    email: 'mary.sales@gmail.com',
+    password: await hashPassword('wsssA+f2'),
+    roleType: RoleTypes.Sales,
+    roleId: salesRole.id,
+  };
+  const sales2: SeedUser = {
+    firstName: 'Donna',
+    lastName: 'Powell',
+    email: 'donna.sales@gmail.com',
+    password: await hashPassword('wsssA+f2'),
+    roleType: RoleTypes.Sales,
+    roleId: salesRole.id,
+  };
+
+  const users = [admin, sales1, sales2];
+
+  return prisma.user.createMany({ data: users });
+}
+
 async function main() {
-  await Promise.all([createFlights(400), createRoles()]);
+  await Promise.all([createFlights(400), createRoles(), createDefaultUsers()]);
 }
 
 main()
