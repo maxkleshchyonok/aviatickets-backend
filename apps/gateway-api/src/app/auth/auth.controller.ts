@@ -99,7 +99,11 @@ export class AuthController {
     if (body.newPassword !== body.confirmNewPassword) {
       throw new InternalServerErrorException(ErrorMessage.BadPassword);
     }
-    await this.authService.changePassword(user, body);
+    const response = await this.authService.changePassword(user, body);
+    if (!response) {
+      throw new InternalServerErrorException(ErrorMessage.BadPassword);
+    }
+    return response;
   }
 
   @Post('forgot-password')
@@ -111,6 +115,7 @@ export class AuthController {
 
     const resetToken = this.authService.generateResetToken(userEntity, body);
     const resetCode = this.authService.generateResetCode();
+    console.log(resetCode);
 
     const messageInfo = await this.authService.sendResetCodeToUserByEmail(
       userEntity,
@@ -122,6 +127,7 @@ export class AuthController {
     }
 
     const hashedResetCode = this.authService.hashResetCode(resetCode);
+    console.log(hashedResetCode);
 
     await this.authService.createDevice(userEntity, body, hashedResetCode);
 

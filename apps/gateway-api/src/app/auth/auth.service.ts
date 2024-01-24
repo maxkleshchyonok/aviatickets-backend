@@ -115,6 +115,7 @@ export class AuthService {
     );
 
     if (deviceEntity) {
+      await this.devicesRepo.updateResetCode(deviceEntity.id, resetCode);
       return deviceEntity;
     }
 
@@ -135,7 +136,6 @@ export class AuthService {
       user,
       device,
     );
-
     const hashedResetCode = this.securityService.hashResetCode(code);
 
     if (deviceEntity.hashedResetCode !== hashedResetCode) {
@@ -229,10 +229,16 @@ export class AuthService {
     },
   ) {
     const user = await this.usersRepo.findOneById(userData);
-    if (user.password === changeData.oldPassword) {
+    if (
+      user.password ===
+      (await this.securityService.hashPassword(changeData.oldPassword))
+    ) {
+      const password = await this.securityService.hashPassword(
+        changeData.newPassword,
+      );
       const newData: Pick<User, 'id' | 'password'> = {
         id: user.id,
-        password: changeData.newPassword,
+        password: password,
       };
       return this.usersRepo.changePassword(newData);
     }
