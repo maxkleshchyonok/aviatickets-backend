@@ -120,7 +120,6 @@ export class AuthController {
   }
 
   @Post('verify-reset-code')
-  @RequirePermissions(UserPermissions.VerifyResetCode)
   async verifyResetCode(
     @Headers('authorization') token: string,
     @Body() body: VerifyResetCodeForm,
@@ -129,7 +128,6 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  @RequirePermissions(UserPermissions.ResetPassword)
   async resetPassword(
     @Headers('authorization') token: string,
     @Body() body: ResetPasswordForm,

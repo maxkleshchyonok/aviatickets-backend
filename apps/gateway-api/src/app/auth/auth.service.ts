@@ -7,6 +7,7 @@ import { SecurityService } from 'libs/security/security.service';
 import { MailerService } from 'api/libs/mailer/mailer.service';
 import { UserDeviceRepo } from 'api/domain/repos/user-device.repo';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
+import { UserIdentifier } from 'api/types/model-identifiers.types';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,10 @@ export class AuthService {
 
   async findUserByEmail(user: Pick<User, 'email'>) {
     return await this.usersRepo.findOneByEmail(user);
+  }
+
+  async findUserById(user: UserIdentifier) {
+    return await this.usersRepo.findOneById(user);
   }
 
   async findUserByEmailAndPassword(user: Pick<User, 'email' | 'password'>) {
