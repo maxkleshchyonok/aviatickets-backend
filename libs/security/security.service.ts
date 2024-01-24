@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Device, Role, User } from '@prisma/client';
 import { SecurityConfig } from 'api/config/security.config';
+import { UserResetTokenDto } from 'api/domain/dto/user-reset-token.dto';
 import { UserSessionDto } from 'api/domain/dto/user-session.dto';
 import { ErrorMessage } from 'api/enums/error-message.enum';
 import * as crypto from 'crypto';
@@ -57,9 +58,9 @@ export class SecurityService {
     const { secret: resetSecret, signOptions: resetSignOptions } =
       securityConfig.resetTokenOptions;
 
-    const payload = {
+    const payload: UserResetTokenDto = {
       deviceId: device.deviceId,
-      userId: user.id,
+      id: user.id,
       hashedResetCode,
     };
 
