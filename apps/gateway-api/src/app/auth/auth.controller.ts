@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   HttpCode,
   HttpStatus,
@@ -22,6 +23,7 @@ import { ResetPasswordForm } from 'api/app/auth/dto/reset-password.form';
 import { ChangePasswordForm } from './dto/change-password.form';
 import { RequirePermissions } from 'libs/security/decorators/require-permissions.decorator';
 import { UserPermissions } from '@prisma/client';
+import { RefreshTokenGuard } from 'libs/security/guards/refresh-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -45,9 +47,7 @@ export class AuthController {
 
     const tokens = await this.authService.authenticate(newUserEntity, body);
 
-    return AuthDto.from({
-      ...tokens,
-    });
+    return AuthDto.from(tokens);
   }
 
   @Post('signin')
@@ -63,9 +63,7 @@ export class AuthController {
 
     const tokens = await this.authService.authenticate(userEntity, body);
 
-    return AuthDto.from({
-      ...tokens,
-    });
+    return AuthDto.from(tokens);
   }
 
   @Post('signout')
@@ -74,6 +72,20 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async signout(@CurrentUser() user: UserSessionDto) {
     return await this.authService.signout(user);
+  }
+
+  @Get('refresh-tokens')
+  @UseGuards(RefreshTokenGuard)
+  async refreshTokens(@CurrentUser() user: UserSessionDto) {
+    const userEntity = await this.authService.findUserById(user);
+    if (!userEntity) {
+      throw new InternalServerErrorException(ErrorMessage.UserNotExists);
+    }
+
+    const device = { deviceId: user.deviceId };
+    const tokens = await this.authService.authenticate(userEntity, device);
+
+    return AuthDto.from(tokens);
   }
 
   @Post('change-password')
