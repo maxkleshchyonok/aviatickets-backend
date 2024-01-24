@@ -1,14 +1,18 @@
 import { Passenger } from '@prisma/client';
 import { UUIDDto } from './uuid.dto';
 import { IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class PassengerDto extends UUIDDto {
+  @ApiProperty({ description: 'passenger first name' })
   @IsString()
   firstName: string;
 
+  @ApiProperty({ description: 'passenger last name' })
   @IsString()
   lastName: string;
 
+  @ApiProperty({ description: 'passenger passport id' })
   @IsString()
   passportId: string;
 
